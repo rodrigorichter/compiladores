@@ -1,10 +1,4 @@
-if (x>20) return 0;
-else print("wow");
-
-while (x==10
-
-) {i=i+1;
+identificador = 10
+for identificador {
+	
 }
-
-
-"eaee\"noi"

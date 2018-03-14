@@ -3,8 +3,10 @@
 	#include "tokens.h"
 	#include <string.h>
 	int running = 1;
-	int lineNumber=1;
+	extern int yylineno;
 %}
+
+%option yylineno
 
 %%
 
@@ -37,7 +39,7 @@ print return KW_PRINT;
 \/\/.* ;
 "/*"([^*]|\*+[^*/])*\*+"/" ;
 [ \t]+ ;
-\n lineNumber++;
+"\r\n" ;
 . return TOKEN_ERROR;
 
 %%
@@ -55,9 +57,9 @@ int main(int argc, char *argv[]) {
 	yyin = fp;
 	while(running) {
 		token = yylex();
-		printf("token: %d, buffer: %s\n",token,yytext);
+		printf("line: %d, token: %d, buffer: %s\n",yylineno,token,yytext);
 	}
-printf("lin: %d",lineNumber);
+printf("line count: %d\n",yylineno);
 
 }
 
@@ -65,7 +67,6 @@ printf("lin: %d",lineNumber);
 
 void initMe() {
 	running = 1;
-	lineNumber = 1;
 }
 
 int yywrap(void) {
@@ -74,5 +75,5 @@ int yywrap(void) {
 }
 
 int getLineNumber(void) {
-	return lineNumber;
+	return yylineno;
 }
