@@ -1,4 +1,4 @@
-identificador = 10
-for identificador {
-	
-}
+"string"
+'c'
+"string""string"
+

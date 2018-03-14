@@ -55,12 +55,10 @@ int main(int argc, char *argv[]) {
 		exit(2);
 	}
 	yyin = fp;
-	while(running) {
-		token = yylex();
+
+	while( (token = yylex()) ) {
 		printf("line: %d, token: %d, buffer: %s\n",yylineno,token,yytext);
 	}
-printf("line count: %d\n",yylineno);
-
 }
 
 // Funções
@@ -70,6 +68,7 @@ void initMe() {
 }
 
 int yywrap(void) {
+	printf("yywrap EOF line: %d\n",yylineno);
 	running = 0;
 	return 1;
 }
