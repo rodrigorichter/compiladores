@@ -8,6 +8,7 @@
 
 %option yylineno
 
+
 %%
 
 char return KW_CHAR;
@@ -36,7 +37,7 @@ print return KW_PRINT;
 \"([^"]|\\\"|\\n)*\" return LIT_STRING;
 
 [\-,;:()\[\]{}+\*\/<>=!&$#] return yytext[0];
-\/\/.* ;
+\/\/.* yylineno++;
 "/*"([^*]|\*+[^*/])*\*+"/" ;
 [ \t]+ ;
 "\r\n" ;
