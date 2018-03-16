@@ -8,9 +8,8 @@
 #
 
 etapa1: lex.yy.c
-	gcc -o etapa1 lex.yy.c
-lex.yy.c: scanner.l
+	gcc -o etapa1 lex.yy.c symbols.c hashmap.c
+lex.yy.c: scanner.l symbols.c hashmap.c 
 	lex scanner.l
-
 clean:
 	rm lex.yy.c etapa1
