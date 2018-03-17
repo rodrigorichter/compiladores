@@ -32,6 +32,9 @@ int addSymbol(int type, char* key, int line) {
 		case LIT_STRING:
 			snprintf(symbol->stringValue, KEY_MAX_LENGTH, "%s", key);
 			break;
+		case TK_IDENTIFIER:
+			snprintf(symbol->stringValue, KEY_MAX_LENGTH, "%s", key);
+			break;
 	}
 
 	printSymbol(symbol);

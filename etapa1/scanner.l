@@ -1,8 +1,7 @@
 %{
-	#include <stdio.h>
 	#include "tokens.h"
 	#include "symbols.h"
-	#include <string.h>
+	
 	int running = 1;
 	extern int yylineno;
 	extern void initMe();
@@ -26,7 +25,11 @@ read return KW_READ;
 return return KW_RETURN;
 print return KW_PRINT;
 
-[a-zA-Z_][0-9a-zA-Z_]* return TK_IDENTIFIER;
+[a-zA-Z_][0-9a-zA-Z_]* {
+	printf("TK_IDENTIFIER\n");
+	addSymbol(TK_IDENTIFIER, yytext, yylineno);
+	return TK_IDENTIFIER;
+}
 \<\= return OPERATOR_LE;
 \>\= return OPERATOR_GE;
 \=\= return OPERATOR_EQ;
@@ -66,25 +69,6 @@ print return KW_PRINT;
 . return TOKEN_ERROR;
 
 %%
-
-int main(int argc, char *argv[]) {
-	if (argc != 2) exit(1);
-	int token;
-
-	initMe(); //function will be called by tests
-
-	FILE *fp;
-	fp = fopen(argv[1],"r");
-	if (fp == NULL) {
-		printf("Could not open file: %s\n",argv[1]);
-		exit(2);
-	}
-	yyin = fp;
-
-	while( (token = yylex()) ) {
-		printf("line: %d, token: %d, buffer: %s\n",yylineno,token,yytext);
-	}
-}
 
 // Funções
 
