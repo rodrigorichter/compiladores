@@ -36,13 +36,27 @@ print return KW_PRINT;
 
 [0-9]+ {
 	printf("LIT_INTEGER\n");
-	addIntegerSymbol(LIT_INTEGER, yytext, yylineno);
+	addSymbol(LIT_INTEGER, yytext, yylineno);
 	return LIT_INTEGER;
 }
 
-[0-9]+\.[0-9]+ return LIT_REAL;
-\'.\' return LIT_CHAR;
-\"([^"]|\\\"|\\n)*\" return LIT_STRING;
+[0-9]+\.[0-9]+ {
+	printf("LIT_REAL\n");
+	addSymbol(LIT_REAL, yytext, yylineno);
+	return LIT_REAL;
+}
+
+\'.\' {
+	printf("LIT_CHAR\n");
+	addSymbol(LIT_CHAR, yytext, yylineno);
+	return LIT_CHAR;
+}
+
+\"([^"]|\\\"|\\n)*\" {
+	printf("LIT_STRING\n");
+	addSymbol(LIT_STRING, yytext, yylineno);
+	return LIT_STRING;
+}
 
 [\-,;:()\[\]{}+\*\/<>=!&$#] return yytext[0];
 \/\/.* yylineno++;
@@ -84,8 +98,8 @@ int yywrap(void) {
 	printf("yywrap EOF line: %d\n",yylineno);
 	running = 0;
 
-	char *key = "3";
-	getSymbol(key);
+	//char key[] = "3";
+	//getSymbol(key);
 
 	return 1;
 }

@@ -1,4 +1,6 @@
 #include "symbols.h"
+#include "tokens.h"
+#include <string.h>
 
 int initMap() {
 	printf("initMap()\n");
@@ -6,15 +8,31 @@ int initMap() {
 	return 0;
 }
 
-int addIntegerSymbol(int type, char* key, int line) {
-	printf("addIntegerSymbol(%d, %s, %d)\n", type, key, line);
+int addSymbol(int type, char* key, int line) {
+	printf("addSymbol(%d, %s, %d)\n", type, key, line);
 	symbol_t* symbol;
 	symbol = malloc(sizeof(symbol_t));
 	snprintf(symbol->key, KEY_MAX_LENGTH, "%s", key);
 	
 	symbol->line = line;
 	symbol->type = type;
-	symbol->intValue = 99;
+
+	char *ptr;
+
+	switch(type) {
+		case LIT_INTEGER:
+			symbol->intValue = strtol(key,&ptr,10);
+			break;
+		case LIT_REAL:
+			symbol->doubleValue = strtod(key,&ptr);
+			break;
+		case LIT_CHAR:
+			symbol->charValue = key[1];
+			break;
+		case LIT_STRING:
+			snprintf(symbol->stringValue, KEY_MAX_LENGTH, "%s", key);
+			break;
+	}
 
 	printSymbol(symbol);
 
@@ -23,6 +41,7 @@ int addIntegerSymbol(int type, char* key, int line) {
 	assert(error==MAP_OK);
 	return 0;
 }
+
 
 symbol_t* getSymbol(char *key) {
 	printf("getSymbol(%s)\n",key);
