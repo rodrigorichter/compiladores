@@ -1,4 +1,2 @@
-"string"
-'c'
-"string""string"
-
+1
+2

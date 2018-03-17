@@ -13,4 +13,6 @@ DerivedData/
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
-*.o
+etapa1/*.o
+etapa1/lex.yy.c
+etapa1/etapa1

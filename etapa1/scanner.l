@@ -1,9 +1,12 @@
 %{
 	#include <stdio.h>
 	#include "tokens.h"
+	#include "symbols.h"
 	#include <string.h>
 	int running = 1;
 	extern int yylineno;
+	extern void initMe();
+	extern int getLineNumber(void);
 %}
 
 %option yylineno
@@ -31,7 +34,12 @@ print return KW_PRINT;
 \&\& return OPERATOR_AND;
 \|\| return OPERATOR_OR;
 
-[0-9]+ return LIT_INTEGER;
+[0-9]+ {
+	printf("LIT_INTEGER\n");
+	addIntegerSymbol(LIT_INTEGER, yytext, yylineno);
+	return LIT_INTEGER;
+}
+
 [0-9]+\.[0-9]+ return LIT_REAL;
 \'.\' return LIT_CHAR;
 \"([^"]|\\\"|\\n)*\" return LIT_STRING;
@@ -49,6 +57,8 @@ int main(int argc, char *argv[]) {
 	if (argc != 2) exit(1);
 	int token;
 
+	initMe(); //function will be called by tests
+
 	FILE *fp;
 	fp = fopen(argv[1],"r");
 	if (fp == NULL) {
@@ -65,12 +75,18 @@ int main(int argc, char *argv[]) {
 // Funções
 
 void initMe() {
+	printf("initMe()\n");
 	running = 1;
+	initMap();
 }
 
 int yywrap(void) {
 	printf("yywrap EOF line: %d\n",yylineno);
 	running = 0;
+
+	char *key = "3";
+	getSymbol(key);
+
 	return 1;
 }
 
