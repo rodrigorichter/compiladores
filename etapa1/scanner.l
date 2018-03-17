@@ -26,7 +26,11 @@ read return KW_READ;
 return return KW_RETURN;
 print return KW_PRINT;
 
-[a-zA-Z_][0-9a-zA-Z_]* return TK_IDENTIFIER;
+[a-zA-Z_][0-9a-zA-Z_]* {
+	printf("TK_IDENTIFIER\n");
+	addSymbol(TK_IDENTIFIER, yytext, yylineno);
+	return TK_IDENTIFIER;
+}
 \<\= return OPERATOR_LE;
 \>\= return OPERATOR_GE;
 \=\= return OPERATOR_EQ;
