@@ -98,8 +98,8 @@ int yywrap(void) {
 	printf("yywrap EOF line: %d\n",yylineno);
 	running = 0;
 
-	//char key[] = "3";
-	//getSymbol(key);
+	char *key = "3";
+	getSymbol(key);
 
 	return 1;
 }
