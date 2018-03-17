@@ -107,3 +107,7 @@ int yywrap(void) {
 int getLineNumber(void) {
 	return yylineno;
 }
+
+int isRunning(void) {
+	return running;
+}
