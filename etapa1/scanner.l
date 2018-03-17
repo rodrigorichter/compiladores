@@ -1,8 +1,7 @@
 %{
-	#include <stdio.h>
 	#include "tokens.h"
 	#include "symbols.h"
-	#include <string.h>
+	
 	int running = 1;
 	extern int yylineno;
 	extern void initMe();
@@ -70,25 +69,6 @@ print return KW_PRINT;
 . return TOKEN_ERROR;
 
 %%
-
-int main(int argc, char *argv[]) {
-	if (argc != 2) exit(1);
-	int token;
-
-	initMe(); //function will be called by tests
-
-	FILE *fp;
-	fp = fopen(argv[1],"r");
-	if (fp == NULL) {
-		printf("Could not open file: %s\n",argv[1]);
-		exit(2);
-	}
-	yyin = fp;
-
-	while( (token = yylex()) ) {
-		printf("line: %d, token: %d, buffer: %s\n",yylineno,token,yytext);
-	}
-}
 
 // Funções
 
