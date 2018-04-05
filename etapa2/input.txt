@@ -1,0 +1,31 @@
+int a = 'b';
+char wow = 5;
+float yey = 3.14;
+float a[50]: 5 2 'a';
+int #pt = 0;
+
+int a = 0;
+int i = 0;
+int v[10]: 0 0 0 0 0 0 0 0 0 0; 
+int mat[10]; 
+float f = 10.55;
+char c = 'x';
+char d = 65;
+int #pt = 0;
+
+
+int main(int b, int c) {
+	a=5;
+	heh=2.25+'a';
+	oi=14/5+2<=5;
+	a=!4;
+	vec=4+wow[4-1<=4];
+	vec[5+2+!5]=23;
+	read wow;
+	print "hehehe" 5+2;
+
+}
+a=2;
+a=fun('e');
+a=fun(a,b,2,&a,#heh);
+
