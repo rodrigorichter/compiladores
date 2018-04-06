@@ -12,6 +12,7 @@
 %token KW_ELSE       263
 %token KW_WHILE      264
 %token KW_FOR        265
+%token KW_TO         269
 %token KW_READ       266
 %token KW_RETURN     267
 %token KW_PRINT      268
@@ -29,6 +30,7 @@
 %token LIT_CHAR      285
 %token LIT_STRING    286
 %token TOKEN_ERROR   290
+
 
 %%
 
@@ -53,6 +55,7 @@ dec:
 	Type TK_IDENTIFIER '(' Paraml ')' block
 	|
 	cmdl
+	|
 	;
 
 Type:
@@ -95,12 +98,9 @@ cmdl:
 	cmd ';' cmdl
 	|
 	cmd
-	|
 	;
 
 cmd:
-	';'
-	|
 	block
 	|
 	TK_IDENTIFIER '=' expr
@@ -112,6 +112,15 @@ cmd:
 	KW_PRINT Eleml
 	|
 	KW_RETURN expr
+	|
+	KW_IF '(' expr ')' KW_THEN cmd
+	|
+	KW_IF '(' expr ')' KW_THEN cmd KW_ELSE cmd
+	|
+	KW_WHILE '(' expr ')' cmd
+	|
+	KW_FOR '(' TK_IDENTIFIER '=' expr KW_TO expr ')' cmd
+	|
 	;
 
 Eleml:
@@ -130,9 +139,16 @@ expr:
 	|
 	opUn expr
 	|
+	'(' expr ')'
+	|
 	TK_IDENTIFIER
 	|
 	TK_IDENTIFIER '[' expr ']'
+	|
+	|
+	'&' TK_IDENTIFIER
+	|
+	'#' TK_IDENTIFIER
 	|
 	Value
 	|
@@ -187,9 +203,11 @@ Arg:
 	;
 
 
+
+
+
 %%
 
-int yyerror(int code) {
-	printf("Error!!\n");
-	exit(3);
+int yyerror(char const *s) {
+	printf("%s at line %d\n", s,getLineNumber());
 }

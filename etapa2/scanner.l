@@ -21,6 +21,7 @@ then return KW_THEN;
 else return KW_ELSE;
 while return KW_WHILE;
 for return KW_FOR;
+to return KW_TO;
 read return KW_READ;
 return return KW_RETURN;
 print return KW_PRINT;
@@ -59,8 +60,7 @@ print return KW_PRINT;
 [\-,;:()\[\]{}+\*\/<>=!&$#] return yytext[0];
 \/\/.* yylineno++;
 "/*"([^*]|\*+[^*/])*\*+"/" ;
-[ \t]+ ;
-"\r\n" ;
+[ \t\r\n]+ ;
 . return TOKEN_ERROR;
 
 %%

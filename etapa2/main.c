@@ -26,7 +26,13 @@ int main(int argc, char *argv[]) {
 	}
 	yyin = fp;
 
-	while( isRunning() ) {
-		yyparse();
+	int parseError=0;
+	if( isRunning() ) {
+		parseError=yyparse();
+
+		if(parseError==1)
+			exit(3);
+		else if(parseError==0)
+			exit(0);
 	}
 }

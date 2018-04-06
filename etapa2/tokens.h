@@ -15,6 +15,7 @@
 #define KW_ELSE       263
 #define KW_WHILE      264
 #define KW_FOR        265
+#define KW_TO         269
 #define KW_READ       266
 #define KW_RETURN     267
 #define KW_PRINT      268
