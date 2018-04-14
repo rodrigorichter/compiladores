@@ -15,14 +15,14 @@ int #pt = 0;
 
 
 int main(int b, int c) {
-	a=5;
-	heh=2.25+'a';
-	oi=14/5+2<=5;
-	a=!4;
-	vec=4+wow[4-1<=4];
-	vec[5+2+!5]=23;
-	read wow;
-	print "hehehe" 5+2;
+  a=5;
+  heh=2.25+'a';
+  oi=14/5+2<=5;
+  a=!4;
+  vec=4+wow[4-1<=4];
+  vec[5+2+!5]=23;
+  read wow;
+  print "hehehe" 5+2;
 
 }
 a=2;
@@ -62,7 +62,7 @@ int main()
   read i;
   while (i<10)
     {
-    a = incn(a,1);
+    a = incn(a+b);
     i = i + 1
     };
 
@@ -72,7 +72,7 @@ int main()
   if (a==11) then
     ;
   if (a==11) then else
-	;
+  ;
   ;;;
   {;};
   {}

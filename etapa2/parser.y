@@ -135,16 +135,38 @@ Elem:
 	;
 
 expr:
-	expr opBin expr
+
+	expr '+' expr
 	|
-	opUn expr
+	expr '-' expr
+	|
+	expr '*' expr
+	|
+	expr '/' expr
+	|
+	expr '<' expr
+	|
+	expr '>' expr
+	|
+	expr OPERATOR_LE expr
+	|
+	expr OPERATOR_GE expr
+	|
+	expr OPERATOR_EQ expr
+	|
+	expr OPERATOR_NE expr
+	|
+	expr OPERATOR_AND expr
+	|
+	expr OPERATOR_OR expr
+	|
+	'!' expr
 	|
 	'(' expr ')'
 	|
 	TK_IDENTIFIER
 	|
 	TK_IDENTIFIER '[' expr ']'
-	|
 	|
 	'&' TK_IDENTIFIER
 	|
@@ -153,57 +175,15 @@ expr:
 	Value
 	|
 	TK_IDENTIFIER '(' Argl ')'
-	;
-
-opBin:
-	'+'
 	|
-	'-'
-	|
-	'*'
-	|
-	'/'
-	|
-	'<'
-	|
-	'>'
-	|
-	OPERATOR_LE
-	|
-	OPERATOR_GE
-	|
-	OPERATOR_EQ
-	|
-	OPERATOR_NE
-	|
-	OPERATOR_AND
-	|
-	OPERATOR_OR
-	;
-
-opUn:
-	'!'
+	TK_IDENTIFIER '(' ')'
 	;
 
 Argl:
-	Arg ',' Argl
+	expr ',' Argl
 	|
-	Arg
-	|
+	expr
 	;
-
-Arg:
-	TK_IDENTIFIER
-	|
-	'&' TK_IDENTIFIER
-	|
-	'#' TK_IDENTIFIER
-	|
-	Value
-	;
-
-
-
 
 
 %%
