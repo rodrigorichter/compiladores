@@ -54,6 +54,9 @@ int yylex();
 %type <node> expr
 %type <node> Param
 %type <node> Paraml
+%type <node> Eleml
+%type <node> Elem
+%type <node> Argl
 
 %type <token> Type
 
@@ -72,7 +75,7 @@ int yylex();
 program:
 	decl { 
 		$$ = astCreate(AST_PROGRAM,0,$1,0,0,0);
-		astPrint(astSetRoot($$),0);
+		//astPrint(astSetRoot($$),0);
 		decompile($$);
 	}
 	;
@@ -90,24 +93,33 @@ decl:
 
 dec:
 	Type TK_IDENTIFIER '=' Value ';' {
-		$$ = astCreate(AST_DEC,$2,$4,0,0,0);
+		$$ = astCreate(AST_ASS,$2,$4,0,0,0);
+		$$->returnType = $1;
 	}
 	|
-	Type TK_IDENTIFIER '[' LIT_INTEGER ']' ';' {$$ = 0;}
+	Type TK_IDENTIFIER '[' LIT_INTEGER ']' ';' {
+		AST *symbol = astCreate(AST_SYMBOL,$4,0,0,0,0);
+		$$ = astCreate(AST_VECTOR,$2,symbol,0,0,0);
+		$$->returnType = $1;
+	}
 	|
 	Type TK_IDENTIFIER '[' LIT_INTEGER ']' ':' Valuel ';' {
-		$$ = astCreate(AST_DEC,$2,$7,0,0,0);
+		AST *symbol = astCreate(AST_SYMBOL,$4,0,0,0,0);
+		$$ = astCreate(AST_VECTOR,$2,symbol,$7,0,0);
+		$$->returnType = $1;
 	}
 	|
-	Type '#' TK_IDENTIFIER '=' Value ';' {$$ = 0;}
+	Type '#' TK_IDENTIFIER '=' Value ';' {
+		$$ = 0;
+	}
 	|
 	Type TK_IDENTIFIER '(' Paraml ')' block {
 		$$ = astCreate(AST_FUNC_DECL,$2,$4,$6,0,0);
 		$$->returnType = $1;
 	}
 	|
-	cmdl {$$ = 0;}
-	|
+	cmdl {$$ = $1;}
+	| {$$ = 0;}
 	;
 
 Type:
@@ -184,84 +196,97 @@ cmd:
 	|
 	TK_IDENTIFIER '=' expr {$$ = astCreate(AST_ASS,$1,$3,0,0,0);}
 	|
-	TK_IDENTIFIER '[' expr ']' '=' expr
+	TK_IDENTIFIER '[' expr ']' '=' expr {$$ = astCreate(AST_INDEX_ASS,$1,$3,$6,0,0);}
 	|
-	KW_READ TK_IDENTIFIER
+	KW_READ TK_IDENTIFIER {$$ = astCreate(AST_READ,$2,0,0,0,0);}
 	|
-	KW_PRINT Eleml
+	KW_PRINT Eleml {$$ = astCreate(AST_PRINT,0,$2,0,0,0);}
 	|
-	KW_RETURN expr
+	KW_RETURN expr {$$ = astCreate(AST_RETURN,0,$2,0,0,0);}
 	|
-	KW_IF '(' expr ')' KW_THEN cmd
+	KW_IF '(' expr ')' KW_THEN cmd {$$ = astCreate(AST_IF_THEN,0,$3,$6,0,0);}
 	|
-	KW_IF '(' expr ')' KW_THEN cmd KW_ELSE cmd
+	KW_IF '(' expr ')' KW_THEN cmd KW_ELSE cmd {$$ = astCreate(AST_IF_THEN_ELSE,0,$3,$6,$8,0);}
 	|
-	KW_WHILE '(' expr ')' cmd
+	KW_WHILE '(' expr ')' cmd {$$ = astCreate(AST_WHILE,0,$3,$5,0,0);}
 	|
-	KW_FOR '(' TK_IDENTIFIER '=' expr KW_TO expr ')' cmd
+	KW_FOR '(' TK_IDENTIFIER '=' expr KW_TO expr ')' cmd {
+		AST *ass = astCreate(AST_ASS,$3,$5,0,0,0);
+		$$ = astCreate(AST_FOR,0, ass,$7,$9,0);
+	}
 	| {$$ = 0;}
 	;
 
 Eleml:
-	Elem Eleml
-	|
+	Elem Eleml {
+		if($2 != 0) {
+			$$ = astCreate(AST_ELEML,0,$1,$2,0,0);
+		} else {
+			$$ = astCreate(AST_ELEML,0,$1,0,0,0);
+		}
+	}
+	| {$$ = 0;}
 	;
 
 Elem:
-	LIT_STRING
+	LIT_STRING {$$ = astCreate(AST_SYMBOL, $1, 0,0,0,0);}
 	|
-	expr
+	expr {$$ = $1;}
 	;
 
 expr:
 
-	expr '+' expr
+	expr '+' expr {$$ = astCreate(AST_ADD,0,$1,$3,0,0);}
 	|
-	expr '-' expr
+	expr '-' expr {$$ = astCreate(AST_SUB,0,$1,$3,0,0);}
 	|
-	expr '*' expr
+	expr '*' expr {$$ = astCreate(AST_MULT,0,$1,$3,0,0);}
 	|
-	expr '/' expr
+	expr '/' expr {$$ = astCreate(AST_DIV,0,$1,$3,0,0);}
 	|
-	expr '<' expr
+	expr '<' expr {$$ = astCreate(AST_LESS,0,$1,$3,0,0);}
 	|
-	expr '>' expr
+	expr '>' expr {$$ = astCreate(AST_GREATER,0,$1,$3,0,0);}
 	|
-	expr OPERATOR_LE expr
+	expr OPERATOR_LE expr {$$ = astCreate(AST_LESS_EQ,0,$1,$3,0,0);}
 	|
-	expr OPERATOR_GE expr
+	expr OPERATOR_GE expr {$$ = astCreate(AST_GREATER_EQ,0,$1,$3,0,0);}
 	|
-	expr OPERATOR_EQ expr
+	expr OPERATOR_EQ expr {$$ = astCreate(AST_EQ,0,$1,$3,0,0);}
 	|
-	expr OPERATOR_NE expr
+	expr OPERATOR_NE expr {$$ = astCreate(AST_NEQ,0,$1,$3,0,0);}
 	|
-	expr OPERATOR_AND expr
+	expr OPERATOR_AND expr {$$ = astCreate(AST_AND,0,$1,$3,0,0);}
 	|
-	expr OPERATOR_OR expr
+	expr OPERATOR_OR expr {$$ = astCreate(AST_OR,0,$1,$3,0,0);}
 	|
-	'!' expr
+	'!' expr {$$ = astCreate(AST_NOT,0,$2,0,0,0);}
 	|
-	'(' expr ')'
+	'(' expr ')' {$$ = $2;}
 	|
-	TK_IDENTIFIER
+	TK_IDENTIFIER {$$ = astCreate(AST_SYMBOL,$1,0,0,0,0);}
 	|
-	TK_IDENTIFIER '[' expr ']'
+	TK_IDENTIFIER '[' expr ']' {$$ = astCreate(AST_INDEX_SYMBOL,$1,$3,0,0,0);}
 	|
-	'&' TK_IDENTIFIER
+	'&' TK_IDENTIFIER {$$ = astCreate(AST_BIT_AND,$2,0,0,0,0);}
 	|
-	'#' TK_IDENTIFIER
+	'#' TK_IDENTIFIER {$$ = astCreate(AST_OCTOTHORPE,$2,0,0,0,0);}
 	|
 	Value {$$ = $1;}
 	|
-	TK_IDENTIFIER '(' Argl ')'
+	TK_IDENTIFIER '(' Argl ')' {$$ = astCreate(AST_FUNC_CALL,$1,$3,0,0,0);}
 	|
-	TK_IDENTIFIER '(' ')'
+	TK_IDENTIFIER '(' ')' {$$ = astCreate(AST_FUNC_CALL,$1,0,0,0,0);}
 	;
 
 Argl:
-	expr ',' Argl
+	expr ',' Argl {
+		$$ = astCreate(AST_ARGL,0,$1,$3,0,0);
+	}
 	|
-	expr
+	expr {
+		$$ = $1;
+	}
 	;
 
 

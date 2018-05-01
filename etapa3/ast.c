@@ -28,6 +28,9 @@ void astPrint(AST *node, int level) {
 	}
 	fprintf(stderr, "AST(");
 	switch(node->type)  {
+		case AST_VECTOR:
+			fprintf(stderr, "AST_VECTOR, %s)\n",node->symbol->key);
+			break;
 		case AST_PARAML:
 			fprintf(stderr, "AST_PARAML)\n");
 			break;
@@ -55,14 +58,20 @@ void astPrint(AST *node, int level) {
 		case AST_ASS:
 			fprintf(stderr, "AST_ASS,%s)\n",node->symbol->key);
 			break;
-		case AST_DEC:
-			fprintf(stderr, "AST_DEC,%s)\n",node->symbol->key);
-			break;
 		case AST_PROGRAM:
 			fprintf(stderr, "AST_PROGRAM)\n");
 			break;
 		case AST_BLOCK:
 			fprintf(stderr, "AST_BLOCK)\n");
+			break;
+		case AST_FOR:
+			fprintf(stderr, "AST_FOR)\n");
+			break;
+		case AST_PRINT:
+			fprintf(stderr, "AST_PRINT)\n");
+			break;
+		case AST_ELEML:
+			fprintf(stderr, "AST_ELEML)\n");
 			break;
 		default:
 			fprintf(stderr, "UNRECOGNIZED AST TYPE)\n");
