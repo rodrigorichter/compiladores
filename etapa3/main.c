@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+int isRunning();
 int yyparse();
 int yylex();
 void yyerror(const char *s);

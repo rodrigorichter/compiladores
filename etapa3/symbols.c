@@ -7,7 +7,7 @@ int initMap() {
 	return 0;
 }
 
-int addSymbol(int type, char* key, int line) {
+symbol_t* addSymbol(int type, char* key, int line) {
 	symbol_t* symbol;
 	symbol = malloc(sizeof(symbol_t));
 	snprintf(symbol->key, KEY_MAX_LENGTH, "%s", key);
@@ -35,12 +35,10 @@ int addSymbol(int type, char* key, int line) {
 			break;
 	}
 
-	// printSymbol(symbol);
-
 	int error;
 	error = hashmap_put(symbolMap, symbol->key, symbol);
 	assert(error==MAP_OK);
-	return 0;
+	return symbol;
 }
 
 

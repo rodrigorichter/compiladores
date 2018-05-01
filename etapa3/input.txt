@@ -1,5 +1,5 @@
-int a = 'b';
-char wow = 5;
-float yey = 3.14;
-float a[50]: 5 2 'a';
-int #pt = 0;
+int main() {
+  a = 10;
+  for (i = 1 to 10)
+    print i " ";
+}
