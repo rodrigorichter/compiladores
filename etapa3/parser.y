@@ -1,12 +1,18 @@
 %{
-#include "symbols.h"
+#include "ast.h"
+#include "decompiler.h"
 #include<stdio.h>
 #include<stdlib.h>
-
+extern int getLineNumber(void);
+int yyerror(char const *s);
+int yylex();
 %}
 
 %union {
-	symbol_t*symbol;
+	symbol_t *symbol;
+	char *charValue;
+	struct AST_s *node;
+	int token;
 }
 
 %token KW_CHAR       256
@@ -29,92 +35,154 @@
 %token OPERATOR_AND  274
 %token OPERATOR_OR   275
 
+%error-verbose
 %token <symbol>TK_IDENTIFIER 280
-%token <symbol>TK_LIT_INTEGER 291
-%token <symbol>TK_LIT_REAL 	 292
-%token <symbol>TK_LIT_CHAR   293
-%token <symbol>TK_LIT_STRING 294
-%token LIT_INTEGER   281
-%token LIT_REAL      282
-%token LIT_CHAR      285
-%token LIT_STRING    286
+%token <symbol>LIT_INTEGER   281
+%token <symbol>LIT_REAL      282
+%token <symbol>LIT_CHAR      285
+%token <symbol>LIT_STRING    286
 %token TOKEN_ERROR   290
 
-%left '-' '+'
+%type <node> program
+%type <node> dec
+%type <node> decl
+%type <node> Value
+%type <node> Valuel
+%type <node> block
+%type <node> cmdl
+%type <node> cmd
+%type <node> expr
+%type <node> Param
+%type <node> Paraml
+
+%type <token> Type
+
+%left OPERATOR_OR
+%left OPERATOR_AND
+%left '!' OPERATOR_EQ OPERATOR_NE
+%left '>' OPERATOR_GE
+%left '<' OPERATOR_LE
+%left '+' '-'
 %left '*' '/'
+%right '['']'
+%right '('')'
 
 %%
 
 program:
-	decl
+	decl { 
+		$$ = astCreate(AST_PROGRAM,0,$1,0,0,0);
+		astPrint(astSetRoot($$),0);
+		decompile($$);
+	}
 	;
 
 decl:
-	dec decl
-	|
+	dec decl { 
+		if($1 != 0) {
+			$$ = astCreate(AST_CMDL,0,$1,$2,0,0);
+			} else {
+				$$ = $2;
+			}
+	}
+	| {$$ = 0;}
 	;
 
 dec:
-	Type TK_IDENTIFIER '=' Value ';'
+	Type TK_IDENTIFIER '=' Value ';' {
+		$$ = astCreate(AST_DEC,$2,$4,0,0,0);
+	}
 	|
-	Type TK_IDENTIFIER '[' LIT_INTEGER ']' ';'
+	Type TK_IDENTIFIER '[' LIT_INTEGER ']' ';' {$$ = 0;}
 	|
-	Type TK_IDENTIFIER '[' LIT_INTEGER ']' ':' Valuel ';'
+	Type TK_IDENTIFIER '[' LIT_INTEGER ']' ':' Valuel ';' {
+		$$ = astCreate(AST_DEC,$2,$7,0,0,0);
+	}
 	|
-	Type '#' TK_IDENTIFIER '=' Value ';'
+	Type '#' TK_IDENTIFIER '=' Value ';' {$$ = 0;}
 	|
-	Type TK_IDENTIFIER '(' Paraml ')' block
+	Type TK_IDENTIFIER '(' Paraml ')' block {
+		$$ = astCreate(AST_FUNC_DECL,$2,$4,$6,0,0);
+		$$->returnType = $1;
+	}
 	|
-	cmdl
+	cmdl {$$ = 0;}
 	|
 	;
 
 Type:
-	KW_CHAR
+	KW_CHAR {$$ = KW_CHAR;}
 	|
-	KW_INT
+	KW_INT {$$ = KW_INT;}
 	|
-	KW_FLOAT
+	KW_FLOAT {$$ = KW_FLOAT;}
 	;
 
 Value:
-	LIT_INTEGER
+	LIT_INTEGER {
+		$$ = astCreate(AST_SYMBOL,$1,0,0,0,0);
+	}
 	|
-	LIT_REAL
+	LIT_REAL {
+		$$ = astCreate(AST_SYMBOL,$1,0,0,0,0);
+	}
 	|
-	LIT_CHAR
+	LIT_CHAR {
+		$$ = astCreate(AST_SYMBOL,$1,0,0,0,0);
+	}
 	;
 
 Valuel:
-	Value Valuel
-	|
+	Value Valuel { $$ = astCreate(AST_VALUEL,0,$1,$2,0,0); }
+	| {$$ = 0;}
 	;
 
 Paraml:
-	Param ',' Paraml
+	Param ',' Paraml { 
+		if($3 != 0) {
+			$$ = astCreate(AST_PARAML,0,$1,$3,0,0);
+		} else {
+			$$ = $1;
+		}
+	}
 	|
-	Param
-	|
+	Param {
+		$$ = astCreate(AST_PARAML, 0, $1,0,0,0);
+	}
+	| { $$ = 0; }
 	;
 
 Param:
-	Type TK_IDENTIFIER
+	Type TK_IDENTIFIER {
+		$$ = astCreate(AST_SYMBOL,$2,0,0,0,0);
+		$$->returnType = $1;
+	}
 	;
 
 block:
-	'{' cmdl '}'
+	'{' cmdl '}' {$$ = astCreate(AST_BLOCK,0,$2,0,0,0);}
 	;
 
 cmdl:
-	cmd ';' cmdl
+	cmd ';' cmdl {
+		if($1 != 0) {
+			$$ = astCreate(AST_CMDL,0,$1,$3,0,0);
+		} else {
+			$$ = $3;
+		}
+	}
 	|
-	cmd
+	cmd {
+		if($1 != 0) {
+			$$ = astCreate(AST_CMDL,0,$1,0,0,0);
+		}
+	}
 	;
 
 cmd:
-	block
+	block {$$ = $1;}
 	|
-	TK_IDENTIFIER '=' expr
+	TK_IDENTIFIER '=' expr {$$ = astCreate(AST_ASS,$1,$3,0,0,0);}
 	|
 	TK_IDENTIFIER '[' expr ']' '=' expr
 	|
@@ -131,7 +199,7 @@ cmd:
 	KW_WHILE '(' expr ')' cmd
 	|
 	KW_FOR '(' TK_IDENTIFIER '=' expr KW_TO expr ')' cmd
-	|
+	| {$$ = 0;}
 	;
 
 Eleml:
@@ -183,7 +251,7 @@ expr:
 	|
 	'#' TK_IDENTIFIER
 	|
-	Value
+	Value {$$ = $1;}
 	|
 	TK_IDENTIFIER '(' Argl ')'
 	|
@@ -201,4 +269,5 @@ Argl:
 
 int yyerror(char const *s) {
 	printf("%s at line %d\n", s,getLineNumber());
+	return 0;
 }

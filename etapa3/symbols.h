@@ -4,6 +4,9 @@
 
 #include "hashmap.h"
 
+#ifndef SYMBOLS_H_
+#define SYMBOLS_H_
+
 #define KEY_MAX_LENGTH (256)
 #define KEY_PREFIX ("somekey")
 #define KEY_COUNT (1024*1024)
@@ -24,7 +27,9 @@ map_t symbolMap;
 
 void printSymbol(symbol_t* symbol);
 extern int initMap();
-extern int addSymbol(int type, char* key, int line);
+extern symbol_t* addSymbol(int type, char* key, int line);
 extern symbol_t* getSymbol(char *key);
 // extern int addSymbol(int token, PFany f, any_t item);
 // extern int getSymbol(int token, PFany f, any_t item);
+
+#endif

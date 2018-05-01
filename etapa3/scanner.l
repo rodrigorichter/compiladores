@@ -5,6 +5,7 @@
 	int running = 1;
 	extern int yylineno;
 	extern void initMe();
+	int isRunning();
 	extern int getLineNumber(void);
 %}
 
@@ -40,21 +41,25 @@ print return KW_PRINT;
 
 [0-9]+ {
 	addSymbol(LIT_INTEGER, yytext, yylineno);
+	yylval.symbol = getSymbol(yytext);
 	return LIT_INTEGER;
 }
 
 [0-9]+\.[0-9]+ {
 	addSymbol(LIT_REAL, yytext, yylineno);
+	yylval.symbol = getSymbol(yytext);
 	return LIT_REAL;
 }
 
 \'.\' {
 	addSymbol(LIT_CHAR, yytext, yylineno);
+	yylval.symbol = getSymbol(yytext);
 	return LIT_CHAR;
 }
 
 \"([^"]|\\\"|\\n)*\" {
 	addSymbol(LIT_STRING, yytext, yylineno);
+	yylval.symbol = getSymbol(yytext);
 	return LIT_STRING;
 }
 
@@ -69,13 +74,15 @@ print return KW_PRINT;
 // Funções
 
 void initMe() {
+	printf("initMe\n");
 	running = 1;
 	initMap();
 }
 
 int yywrap(void) {
+	printf("yywrap\n");
 	running = 0;
-
+	
 	return 1;
 }
 

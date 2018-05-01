@@ -1,5 +1,8 @@
-int a = 'b';
-char wow = 5;
-float yey = 3.14;
-float a[50]: 5 2 'a';
-int #pt = 0;
+int a = 0;
+int i = 0;
+
+int main(int h,float j){
+	b = 10;
+	a = 0;
+	i = 0;
+}
