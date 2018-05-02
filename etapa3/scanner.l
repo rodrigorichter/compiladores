@@ -74,13 +74,11 @@ print return KW_PRINT;
 // Funções
 
 void initMe() {
-	printf("initMe\n");
 	running = 1;
 	initMap();
 }
 
 int yywrap(void) {
-	printf("yywrap\n");
 	running = 0;
 	
 	return 1;
