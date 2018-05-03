@@ -35,6 +35,12 @@ int yylex();
 %token OPERATOR_AND  274
 %token OPERATOR_OR   275
 
+%token TK_IDENTIFIER 280
+%token LIT_INTEGER   281
+%token LIT_REAL      282
+%token LIT_CHAR      285
+%token LIT_STRING    286
+
 %error-verbose
 %token <symbol>TK_IDENTIFIER 280
 %token <symbol>LIT_INTEGER   281

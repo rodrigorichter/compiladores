@@ -1,5 +1,5 @@
 #include "symbols.h"
-#include "tokens.h"
+#include "y.tab.h"
 #include <string.h>
 
 int initMap() {

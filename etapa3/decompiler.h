@@ -1,7 +1,8 @@
+#pragma once
 #include <stdlib.h>
 #include <stdio.h>
 #include "ast.h"
-#include "tokens.h"
+#include "y.tab.h"
 
 extern void decompile(AST *node);
 extern void setOutputFile(FILE *output);

@@ -1,9 +1,9 @@
+#ifndef AST_H_
+#define AST_H_
 #include <stdlib.h>
 #include <stdio.h>
 #include "symbols.h"
 
-#ifndef AST_H_
-#define AST_H_
 
 #define MAX_CHILDREN 4
 

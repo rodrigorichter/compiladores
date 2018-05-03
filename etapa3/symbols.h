@@ -1,11 +1,11 @@
+#ifndef SYMBOLS_H_
+#define SYMBOLS_H_
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
 
 #include "hashmap.h"
 
-#ifndef SYMBOLS_H_
-#define SYMBOLS_H_
 
 #define KEY_MAX_LENGTH (256)
 #define KEY_PREFIX ("somekey")
