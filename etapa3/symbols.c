@@ -52,7 +52,7 @@ symbol_t* getSymbol(char *key) {
     return symbol;
 }
 
-void printSymbol(symbol_t* symbol) {
+void printDebugSymbol(symbol_t* symbol) {
 	printf("Print Symbol\n");
 	printf("Key: %s\n", symbol->key);
 	printf("Type: %d\n", symbol->type);

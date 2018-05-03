@@ -28,20 +28,20 @@ void astPrint(AST *node, int level) {
 	}
 	fprintf(stderr, "AST(");
 	switch(node->type)  {
-		case AST_VECTOR:
-			fprintf(stderr, "AST_VECTOR, %s)\n",node->symbol->key);
+		case AST_DEC_VECTOR:
+			fprintf(stderr, "AST_DEC_VECTOR, %s)\n",node->symbol->key);
 			break;
-		case AST_PARAML:
-			fprintf(stderr, "AST_PARAML)\n");
+		case AST_PARAM_LIST:
+			fprintf(stderr, "AST_PARAM_LIST)\n");
 			break;
 		case AST_PARAM:
 			fprintf(stderr, "AST_PARAM,%s)\n",node->symbol->key);
 			break;
-		case AST_FUNC_DECL:
-			fprintf(stderr, "AST_FUNC_DECL,%s)\n",node->symbol->key);
+		case AST_DEC_FUNC:
+			fprintf(stderr, "AST_DEC_FUNC,%s)\n",node->symbol->key);
 			break;
-		case AST_VALUEL: 
-			fprintf(stderr, "AST_VALUEL)\n");
+		case AST_VALUE_LIST: 
+			fprintf(stderr, "AST_VALUE_LIST)\n");
 			break;
 		case AST_SYMBOL: 
 			fprintf(stderr, "AST_SYMBOL,%s)\n",node->symbol->key);
@@ -52,11 +52,11 @@ void astPrint(AST *node, int level) {
 		case AST_SUB:
 			fprintf(stderr, "AST_SUB)\n");
 			break;
-		case AST_CMDL:
-			fprintf(stderr, "AST_CMDL)\n");
+		case AST_CMD_LIST:
+			fprintf(stderr, "AST_CMD_LIST)\n");
 			break;
-		case AST_ASS:
-			fprintf(stderr, "AST_ASS,%s)\n",node->symbol->key);
+		case AST_DEC_VALUE:
+			fprintf(stderr, "AST_DEC_VALUE,%s)\n",node->symbol->key);
 			break;
 		case AST_PROGRAM:
 			fprintf(stderr, "AST_PROGRAM)\n");
@@ -70,8 +70,8 @@ void astPrint(AST *node, int level) {
 		case AST_PRINT:
 			fprintf(stderr, "AST_PRINT)\n");
 			break;
-		case AST_ELEML:
-			fprintf(stderr, "AST_ELEML)\n");
+		case AST_ELEM_LIST:
+			fprintf(stderr, "AST_ELEM_LIST)\n");
 			break;
 		default:
 			fprintf(stderr, "UNRECOGNIZED AST TYPE)\n");

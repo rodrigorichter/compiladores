@@ -25,7 +25,7 @@ typedef struct symbol_s
 
 map_t symbolMap;
 
-void printSymbol(symbol_t* symbol);
+void printDebugSymbol(symbol_t* symbol);
 extern int initMap();
 extern symbol_t* addSymbol(int type, char* key, int line);
 extern symbol_t* getSymbol(char *key);
