@@ -1,6 +1,6 @@
-#Verificação Semântica
+# Verificação Semântica
 
-###Mensagens de erros semânticos
+### Mensagens de erros semânticos
 - terminando com a chamada de exit(4) se tiver havido algum erro semântico. 
 - códigos de saída
  - 0 sucesso, sem erros sintáticos ou semânticos
@@ -10,7 +10,7 @@
  - 4 existência de um ou mais erros semânticos
 
 
-###Verificações
+### Verificações
 - Declarações
 
 > Todos os identificadores devem ter sido declarados, seja como variável, vetor ou como função.
@@ -47,7 +47,7 @@
 
 > Cada chamada de função deve prover um argumento para cada parâmetro, e ter o tipo compatível
 
-###Definições Semânticas
+### Definições Semânticas
 - Há três tipos diferentes de identificadores
 
 > escalares, vetores, funções
@@ -84,7 +84,7 @@
 
 > Isso porque um operador aritmético, por exemplo +, pode resultar tanto em um escalar inteiro como em um escalar real, e isso só é possível descobrir e verificar recursivamente à partir das folhas. 
 
-###Lista de Verificações
+### Lista de Verificações
 - variáveis redeclaradas
 - anotar tipo (natureza) nas tabela hash
 - anotar tipo de dado (dataType) na tabela hash
