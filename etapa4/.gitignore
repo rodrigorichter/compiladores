@@ -2,8 +2,7 @@
 # Created by https://www.gitignore.io/api/c,git,c++,flex,macos,linux,sublimetext
 
 ### Our Executable ###
-etapa3
-
+etapa4
 ### LEX ###
 lex.yy.c
 y.tab.c
