@@ -43,6 +43,10 @@ int yylex();
 %token <symbol>LIT_STRING    286
 %token TOKEN_ERROR   290
 
+%token DT_CHAR 291
+%token DT_INTEGER 292
+%token DT_FLOAT 293
+
 %type <node> program
 %type <node> dec
 %type <node> decl
@@ -75,7 +79,8 @@ int yylex();
 program:
 	decl { 
 		$$ = astCreate(AST_PROGRAM,0,$1,0,0,0);
-		astPrint(astSetRoot($$),0);
+		//astPrint(astSetRoot($$),0);
+		astSetRoot($$);
 		decompile($$);
 	}
 	;

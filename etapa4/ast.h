@@ -56,6 +56,9 @@
 #define AST_SYMBOL_ADDRESS 35
 #define AST_SYMBOL_POINTER 36
 #define AST_DEC 37
+#define AST_TYPECHAR 43
+#define AST_TYPEINT 44
+#define AST_TYPEFLOAT 45
 
 typedef struct AST_s
 {

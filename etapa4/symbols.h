@@ -15,6 +15,7 @@ typedef struct symbol_s
 {
     char key[KEY_MAX_LENGTH];
     int type;
+    int dataType;
     int line;
     long int intValue;
     double doubleValue;

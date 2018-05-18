@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "decompiler.h"
+#include "semantic.h"
 
 int isRunning();
 int yyparse();
@@ -41,10 +42,12 @@ int main(int argc, char *argv[]) {
 	int parseError=0;
 	if( isRunning() ) {
 		parseError=yyparse();
-
 		if(parseError==1)
 			exit(3);
-		else if(parseError==0)
+		else if(parseError==0) {
+			astPrint(root,0);
+			verifyDeclarations(root);
 			exit(0);
+		}
 	}
 }

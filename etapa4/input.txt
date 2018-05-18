@@ -1,15 +1,6 @@
-// UFRGS - Compiladores - Marcelo Johann - 2018/1
-
-int a = 0;
-int i = 0;
-int v[10]: 0 0 0 0 0 0 0 0 0 0; 
-int mat[10]; 
-float f = 10.55;
-char c = 'x';
-char d = 65;
-int #pt = 0;
-
-
+int a=2;
+int a=3;
+float d=4.123;
 int main()
   {
   a = 10;
@@ -18,7 +9,8 @@ int main()
   v[2] = v[10-1];
   for (i = 1 to 10)
     print i " ";
-
+    }
+/*
   print " Digite um numero: \n";
   read i;
   while (i<10)
@@ -48,4 +40,4 @@ int voidfunc()
   {
   }
   
-
+*/

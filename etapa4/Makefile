@@ -7,8 +7,8 @@
 # and #include "main.c" in the last part of the scanner.l
 #
 
-etapa4:  y.tab.o lex.yy.o hashmap.o symbols.o ast.o decompiler.o main.o
-	gcc -o etapa4  y.tab.o lex.yy.o symbols.o hashmap.o ast.o decompiler.o main.o
+etapa4:  y.tab.o lex.yy.o hashmap.o symbols.o ast.o decompiler.o semantic.o main.o
+	gcc -o etapa4  y.tab.o lex.yy.o symbols.o hashmap.o ast.o decompiler.o semantic.o main.o
 
 main.o: main.c
 	gcc -c main.c
@@ -20,6 +20,8 @@ ast.o: ast.c
 	gcc -c ast.c
 decompiler.o: decompiler.c
 	gcc -c decompiler.c
+semantic.o: semantic.c
+	gcc -c semantic.c
 
 y.tab.o: y.tab.c
 	gcc -c y.tab.c

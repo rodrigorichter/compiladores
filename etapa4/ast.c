@@ -88,6 +88,18 @@ void astPrint(AST *node, int level) {
 			printf("AST_SYMBOL, %s)\n", node->symbol->key);
 			break;
 
+		case AST_TYPECHAR:
+			printf("AST_TYPECHAR, %s)\n", node->symbol->key);
+			break;
+
+		case AST_TYPEINT:
+			printf("AST_TYPEINT, %s)\n", node->symbol->key);
+			break;
+
+		case AST_TYPEFLOAT:
+			printf("AST_TYPEFLOAT, %s)\n", node->symbol->key);
+			break;
+
 		case AST_SYMBOL_ADDRESS:
 			printf("AST_SYMBOL_ADDRESS, %s)\n", node->symbol->key);
 			break;

@@ -14,6 +14,7 @@ symbol_t* addSymbol(int type, char* key, int line) {
 	
 	symbol->line = line;
 	symbol->type = type;
+	symbol->dataType = 0;
 
 	char *ptr;
 
@@ -56,6 +57,7 @@ void printDebugSymbol(symbol_t* symbol) {
 	printf("Print Symbol\n");
 	printf("Key: %s\n", symbol->key);
 	printf("Type: %d\n", symbol->type);
+	printf("DataType: %d\n", symbol->dataType);
 	printf("Line: %d\n", symbol->line);
 	return;
 }
