@@ -2,12 +2,13 @@
 #include "y.tab.h"
 #include <string.h>
 
-int initMap() {
-	symbolMap = hashmap_new();
+int initMaps() {
+	scannedSymbolsMap = hashmap_new();
+	declaredSymbolsMap = hashmap_new();
 	return 0;
 }
 
-symbol_t* addSymbol(int type, char* key, int line) {
+symbol_t* addSymbol(map_t *map, int type, char* key, int line) {
 	symbol_t* symbol;
 	symbol = malloc(sizeof(symbol_t));
 	snprintf(symbol->key, KEY_MAX_LENGTH, "%s", key);
@@ -37,16 +38,19 @@ symbol_t* addSymbol(int type, char* key, int line) {
 	}
 
 	int error;
-	error = hashmap_put(symbolMap, symbol->key, symbol);
+	error = hashmap_put(map, symbol->key, symbol);
 	assert(error==MAP_OK);
 	return symbol;
 }
 
 
-symbol_t* getSymbol(char *key) {
+symbol_t* getSymbol(map_t *map, char *key) {
 	symbol_t* symbol;
 	int error;
-    error = hashmap_get(symbolMap, key, (void**)(&symbol));
+    error = hashmap_get(map, key, (void**)(&symbol));
+    if (error == MAP_MISSING) {
+		return NULL;
+	}
     /* Make sure the value was both found and the correct number */
     assert(error==MAP_OK);
     // printSymbol(symbol);

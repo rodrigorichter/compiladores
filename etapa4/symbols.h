@@ -10,6 +10,7 @@
 #define KEY_MAX_LENGTH (256)
 #define KEY_PREFIX ("somekey")
 #define KEY_COUNT (1024*1024)
+#define MAX_PARAMS_COUNT 4
 
 typedef struct symbol_s
 {
@@ -21,16 +22,24 @@ typedef struct symbol_s
     double doubleValue;
     char charValue;
     char stringValue[KEY_MAX_LENGTH];
+
+    int isArray;
+	int arrayCapacity;
+
+	int isPointer;
+
+	int isFunction;
+	const char *parametersIdentifiers[MAX_PARAMS_COUNT];
+	int parametersTypes[MAX_PARAMS_COUNT];
 } symbol_t;
 
 
-map_t symbolMap;
+map_t scannedSymbolsMap;
+map_t declaredSymbolsMap;
 
 void printDebugSymbol(symbol_t* symbol);
-extern int initMap();
-extern symbol_t* addSymbol(int type, char* key, int line);
-extern symbol_t* getSymbol(char *key);
-// extern int addSymbol(int token, PFany f, any_t item);
-// extern int getSymbol(int token, PFany f, any_t item);
+extern int initMaps();
+extern symbol_t* addSymbol(map_t *map, int type, char* key, int line);
+extern symbol_t* getSymbol(map_t *map, char *key);
 
 #endif
