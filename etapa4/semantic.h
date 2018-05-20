@@ -7,4 +7,4 @@
 #define SEMANTIC_SUCCESS 0
 #define SEMANTIC_ERROR 4
 
-int semantic(AST *rootNode);
+int semantic(AST *rootNode, map_t* scope);

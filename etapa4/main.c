@@ -9,6 +9,7 @@ int yyparse();
 int yylex();
 void yyerror(const char *s);
 void initMe();
+int semantic(AST *rootNode, map_t* scope);
 
 extern FILE *yyin;
 extern char *yytext;
@@ -45,7 +46,7 @@ int main(int argc, char *argv[]) {
 	}
 	astPrint(root,0);
 
-	if(semantic(root) != 0) {
+	if(semantic(root, programScope) != 0) {
 		printf("Algum erro na verificacao semantica.\n");
 	} else {
 		printf("Sucesso na verificacao semantica.\n");

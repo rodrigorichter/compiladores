@@ -287,7 +287,7 @@ Argl:
 	}
 	|
 	expr {
-		$$ = $1;
+		$$ = astCreate(AST_ARG_LIST,0,$1,0,0,0);
 	}
 	;
 

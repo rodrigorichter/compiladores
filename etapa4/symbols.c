@@ -4,8 +4,13 @@
 
 int initMaps() {
 	scannedSymbolsMap = hashmap_new();
-	declaredSymbolsMap = hashmap_new();
+	programScope = hashmap_new();
 	return 0;
+}
+
+map_t newMap() {
+	map_t map = hashmap_new();
+	return map;
 }
 
 symbol_t* addSymbol(map_t *map, int type, char* key, int line) {

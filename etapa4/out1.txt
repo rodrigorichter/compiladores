@@ -1,2 +1,4 @@
-int main(int a, int b) {
+int a = 0;
+int main(int b, int c) {
+a = main(a, a, a);
 }

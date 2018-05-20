@@ -29,16 +29,18 @@ typedef struct symbol_s
 	int isPointer;
 
 	int isFunction;
-	const char *parametersIdentifiers[MAX_PARAMS_COUNT];
-	int parametersTypes[MAX_PARAMS_COUNT];
+    int argCount;
+	void* parameters[MAX_PARAMS_COUNT];
+    map_t scope;
 } symbol_t;
 
 
 map_t scannedSymbolsMap;
-map_t declaredSymbolsMap;
+map_t programScope;
 
 void printDebugSymbol(symbol_t* symbol);
 extern int initMaps();
+extern map_t newMap();
 extern symbol_t* addSymbol(map_t *map, int type, char* key, int line);
 extern symbol_t* getSymbol(map_t *map, char *key);
 
