@@ -4,6 +4,8 @@
 	
 	int running = 1;
 	extern int yylineno;
+	extern map_t scannedSymbolsMap;
+	
 	extern void initMe();
 	int isRunning();
 	extern int getLineNumber(void);
@@ -28,8 +30,7 @@ return return KW_RETURN;
 print return KW_PRINT;
 
 [a-zA-Z_][0-9a-zA-Z_]* {
-	addSymbol(TK_IDENTIFIER, yytext, yylineno);
-	yylval.symbol = getSymbol(yytext);
+	yylval.symbol = addSymbol(scannedSymbolsMap,TK_IDENTIFIER, yytext, yylineno);
 	return TK_IDENTIFIER;
 }
 \<\= return OPERATOR_LE;
@@ -40,26 +41,22 @@ print return KW_PRINT;
 \|\| return OPERATOR_OR;
 
 [0-9]+ {
-	addSymbol(LIT_INTEGER, yytext, yylineno);
-	yylval.symbol = getSymbol(yytext);
+	yylval.symbol = addSymbol(scannedSymbolsMap,LIT_INTEGER, yytext, yylineno);
 	return LIT_INTEGER;
 }
 
 [0-9]+\.[0-9]+ {
-	addSymbol(LIT_REAL, yytext, yylineno);
-	yylval.symbol = getSymbol(yytext);
+	yylval.symbol = addSymbol(scannedSymbolsMap,LIT_REAL, yytext, yylineno);
 	return LIT_REAL;
 }
 
 \'.\' {
-	addSymbol(LIT_CHAR, yytext, yylineno);
-	yylval.symbol = getSymbol(yytext);
+	yylval.symbol = addSymbol(scannedSymbolsMap,LIT_CHAR, yytext, yylineno);
 	return LIT_CHAR;
 }
 
 \"([^"]|\\\"|\\n)*\" {
-	addSymbol(LIT_STRING, yytext, yylineno);
-	yylval.symbol = getSymbol(yytext);
+	yylval.symbol = addSymbol(scannedSymbolsMap,LIT_STRING, yytext, yylineno);
 	return LIT_STRING;
 }
 
@@ -75,7 +72,7 @@ print return KW_PRINT;
 
 void initMe() {
 	running = 1;
-	initMap();
+	initMaps();
 }
 
 int yywrap(void) {

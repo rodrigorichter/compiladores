@@ -238,7 +238,6 @@ Elem:
 	;
 
 expr:
-
 	expr '+' expr {$$ = astCreate(AST_ADD,0,$1,$3,0,0);}
 	|
 	expr '-' expr {$$ = astCreate(AST_SUB,0,$1,$3,0,0);}
@@ -288,7 +287,7 @@ Argl:
 	}
 	|
 	expr {
-		$$ = $1;
+		$$ = astCreate(AST_ARG_LIST,0,$1,0,0,0);
 	}
 	;
 

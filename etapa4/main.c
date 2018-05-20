@@ -9,6 +9,7 @@ int yyparse();
 int yylex();
 void yyerror(const char *s);
 void initMe();
+int semantic(AST *rootNode, map_t* scope);
 
 extern FILE *yyin;
 extern char *yytext;
@@ -39,15 +40,16 @@ int main(int argc, char *argv[]) {
 
 	yyin = fp;
 
-	int parseError=0;
-	if( isRunning() ) {
-		parseError=yyparse();
-		if(parseError==1)
-			exit(3);
-		else if(parseError==0) {
-			astPrint(root,0);
-			verifyDeclarations(root);
-			exit(0);
-		}
+	int parseError = yyparse();
+	if(parseError==1) {
+		exit(3);
 	}
+	astPrint(root,0);
+
+	if(semantic(root, programScope) != 0) {
+		printf("Algum erro na verificacao semantica.\n");
+	} else {
+		printf("Sucesso na verificacao semantica.\n");
+	}
+	exit(0);
 }

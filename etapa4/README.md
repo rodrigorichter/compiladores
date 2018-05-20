@@ -9,7 +9,6 @@
  - 3 erro de sintaxe
  - 4 existência de um ou mais erros semânticos
 
-
 ### Verificações
 - Declarações
 
