@@ -29,7 +29,7 @@ int typeCanTakeliteralDataType(int type, int literalDataType) {
 		case KW_INT:
 			return (literalDataType == LIT_INTEGER);
 		case KW_FLOAT:
-			return (literalDataType == LIT_REAL);
+			return (literalDataType == LIT_REAL || literalDataType == LIT_INTEGER);
 		case KW_CHAR:
 			return (literalDataType == LIT_CHAR || literalDataType == LIT_INTEGER);
 		default:
@@ -365,13 +365,36 @@ int semantic(AST *node, map_t* scope) {
 			}
 			return SEMANTIC_SUCCESS;
 
-
-			// semantic(node->children[1]);
 			break;
 
 		case AST_VECTOR_ACCESS:
 			printf("semantic AST_VECTOR_ACCESS, %s\n", node->symbol->key);
-			// semantic(node->children[0]);
+			error = semantic(node->children[0], scope); //se tem sucesso, popula node->children[0]->dataType com o tipo resultante
+			if(error) {
+				return error;
+			}
+			valueNode = node->children[0];
+			literalDataType = valueNode->dataType;
+
+			if(literalDataType!=LIT_INTEGER) {
+				printf("Vector index has to be integer(%d). It is %d.\n",LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			identifier = node->symbol->key;
+
+			declaredSymbol = getSymbolInScopes(scope,programScope,identifier);
+			if(!declaredSymbol) {
+				printf("não estava declarado em nenhum escopo\n");
+				return SEMANTIC_ERROR;
+			}
+			
+			type = declaredSymbol->type;
+			node->dataType=type;
+
+			return SEMANTIC_SUCCESS;
+
+
 			break;
 
 		case AST_READ:
@@ -511,7 +534,7 @@ int semantic(AST *node, map_t* scope) {
 		case AST_SUB:
 		case AST_ADD:
 			printf("semantic AST_BINARY MATH OPERATION\n");
-			printf("firts child type %d\n",node->children[0]->type);
+			printf("first child type %d\n",node->children[0]->type);
 			error = semantic(node->children[0], scope);
 			if (error) {
 				return SEMANTIC_ERROR;
