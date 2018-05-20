@@ -329,7 +329,43 @@ int semantic(AST *node, map_t* scope) {
 
 		case AST_VECTOR_ASS:
 			printf("semantic AST_VECTOR_ASS, %s\n", node->symbol->key);
-			// semantic(node->children[0]);
+			error = semantic(node->children[0], scope); //se tem sucesso, popula node->children[0]->dataType com o tipo resultante
+			if(error) {
+				return error;
+			}
+
+			identifier = node->symbol->key;
+			valueNode = node->children[0];
+			literalDataType = valueNode->dataType;
+
+			if(literalDataType!=LIT_INTEGER) {
+				printf("Vector index has to be integer(%d). It is %d.\n",LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+			
+			error = semantic(node->children[1], scope); //se tem sucesso, popula node->children[0]->dataType com o tipo resultante
+			if(error) {
+				return error;
+			}
+
+			valueNode = node->children[1];
+			literalDataType = valueNode->dataType;
+			printf("has to be declared: %s, as %d\n", identifier,literalDataType);
+			declaredSymbol = getSymbolInScopes(scope,programScope,identifier);
+			if(!declaredSymbol) {
+				printf("não estava declarado em nenhum escopo\n");
+				return SEMANTIC_ERROR;
+			}
+			
+			type = declaredSymbol->type;
+			printf("tipo: %d, lit: %d\n", type,literalDataType);
+			if ( ! typeCanTakeliteralDataType(type, literalDataType) ) {
+				printf("declarou um %d, mas forneceu um %d\n", type, literalDataType);
+				return SEMANTIC_ERROR;
+			}
+			return SEMANTIC_SUCCESS;
+
+
 			// semantic(node->children[1]);
 			break;
 
