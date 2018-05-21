@@ -25,12 +25,13 @@ int literalDataTypeFromKeyword(int keyword) {
 
 int typeCanTakeliteralDataType(int type, int literalDataType) {
 	if(type == literalDataType) {return 1;}//mega gambi hehe
+	type=literalDataTypeFromKeyword(type);
 	switch (type) {
-		case KW_INT:
+		case LIT_INTEGER:
 			return (literalDataType == LIT_INTEGER);
-		case KW_FLOAT:
+		case LIT_REAL:
 			return (literalDataType == LIT_REAL || literalDataType == LIT_INTEGER);
-		case KW_CHAR:
+		case LIT_CHAR:
 			return (literalDataType == LIT_CHAR || literalDataType == LIT_INTEGER);
 		default:
 			return 0;
@@ -62,7 +63,7 @@ int semantic(AST *node, map_t* scope) {
 	if(!scope) {
 		return SEMANTIC_ERROR;
 	}
-	int error, type, literalDataType, size, argCount, rightSideType,leftSideType;
+	int error, type, literalDataType, size, argCount, rightSideType,leftSideType, coercionType;
 	char *identifier;
 	AST *valueNode, *listNode;
 	symbol_t *declaredSymbol;
@@ -104,12 +105,12 @@ int semantic(AST *node, map_t* scope) {
 
 			declaredSymbol = getSymbol(programScope, identifier);
 			if(declaredSymbol) {
-				printf("Simblo já declarado.\n");
+				printf("Simbolo já declarado.\n");
 				return SEMANTIC_ERROR;
 			}
 
-			printf("added to declared map: %s, as %d\n", identifier,literalDataType);
-			addSymbol(programScope, literalDataType, identifier, node->symbol->line);
+			printf("added to declared map: %s, as %d\n", identifier,literalDataTypeFromKeyword(type));
+			addSymbol(programScope, literalDataTypeFromKeyword(type), identifier, node->symbol->line);
 
 			return SEMANTIC_SUCCESS;
 
@@ -404,13 +405,27 @@ int semantic(AST *node, map_t* scope) {
 
 		case AST_PRINT:
 			printf("semantic AST_PRINT\n");
-			// semantic(node->children[0]);
+			error = semantic(node->children[0], scope);
+			if(error) {
+				return error;
+			}
+
+			return SEMANTIC_SUCCESS;
 			break;
 
 		case AST_ELEM_LIST:
 			printf("semantic AST_ELEM_LIST\n");
-			// semantic(node->children[0]);
-			// semantic(node->children[1]);
+			error = semantic(node->children[0], scope);
+			if(error) {
+				return error;
+			}
+
+			error = semantic(node->children[1], scope);
+			if(error) {
+				return error;
+			}
+
+			return SEMANTIC_SUCCESS;
 			break;
 
 		case AST_RETURN:
@@ -420,28 +435,93 @@ int semantic(AST *node, map_t* scope) {
 
 		case AST_IF_THEN:
 			printf("semantic AST_IF_THEN\n");
-			// semantic(node->children[0]);
-			// semantic(node->children[1]);
+			error = semantic(node->children[0], scope);
+			if(error) {
+				return error;
+			}
+
+			if (!(node->children[0]->dataType==LIT_INTEGER||node->children[0]->dataType==LIT_REAL)) {
+				printf("Expressao de tipo invalido.\n");
+				return SEMANTIC_ERROR;
+			}
+			node->dataType=node->children[0]->dataType;
+
+			error = semantic(node->children[1], scope);
+			if(error) {
+				return error;
+			}
+
+			return SEMANTIC_SUCCESS;	
+
 			break;
 
 		case AST_IF_THEN_ELSE:
 			printf("semantic AST_IF_THEN_ELSE\n");
-			// semantic(node->children[0]);
-			// semantic(node->children[1]);
-			// semantic(node->children[2]);
+			error = semantic(node->children[0], scope);
+			if(error) {
+				return error;
+			}
+
+			if (!(node->children[0]->dataType==LIT_INTEGER||node->children[0]->dataType==LIT_REAL)) {
+				printf("Expressao de tipo invalido.\n");
+				return SEMANTIC_ERROR;
+			}
+			node->dataType=node->children[0]->dataType;
+
+			error = semantic(node->children[1], scope);
+			if(error) {
+				return error;
+			}
+
+			error = semantic(node->children[2], scope);
+			if(error) {
+				return error;
+			}
+
+			return SEMANTIC_SUCCESS;
+
 			break;
 
 		case AST_WHILE:
 			printf("semantic AST_WHILE\n");
-			// semantic(node->children[0]);
-			// semantic(node->children[1]);
+			error = semantic(node->children[0], scope);
+			if(error) {
+				return error;
+			}
+
+			if (!(node->children[0]->dataType==LIT_INTEGER||node->children[0]->dataType==LIT_REAL)) {
+				printf("Expressao de tipo invalido.\n");
+				return SEMANTIC_ERROR;
+			}
+			node->dataType=node->children[0]->dataType;
+
+			error = semantic(node->children[1], scope);
+			if(error) {
+				return error;
+			}
+
+			return SEMANTIC_SUCCESS;
+
 			break;
 
 		case AST_FOR:
 			printf("semantic AST_FOR\n");
-			// semantic(node->children[0]);
-			// semantic(node->children[1]);
-			// semantic(node->children[2]);
+			error = semantic(node->children[0], scope);
+			if(error) {
+				return error;
+			}
+
+			error = semantic(node->children[1], scope);
+			if(error) {
+				return error;
+			}
+
+			error = semantic(node->children[2], scope);
+			if(error) {
+				return error;
+			}
+
+			return SEMANTIC_SUCCESS;
 			break;
 
 		case AST_INVOKE_FUNC:
@@ -530,8 +610,83 @@ int semantic(AST *node, map_t* scope) {
 			break;
 		
 		case AST_DIV:
+			printf("semantic AST_BINARY MATH OPERATION\n");
+			printf("first child type %d\n",node->children[0]->type);
+			error = semantic(node->children[0], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+			error = semantic(node->children[1], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			//se chegar aqui tem dois filhos com data type preenchido
+			leftSideType = node->children[0]->dataType;
+			rightSideType = node->children[1]->dataType;
+
+			coercionType = tryCoercion(leftSideType, rightSideType);
+			if(!coercionType) {
+				return SEMANTIC_ERROR;
+			}
+			printf("(%d) + (%d) -> (%d)\n",leftSideType, rightSideType, coercionType);
+			node->dataType = coercionType;//falta fazer coercion e checks disso
+
+			return SEMANTIC_SUCCESS;
+			break;
+
 		case AST_MULT:
+			printf("semantic AST_BINARY MATH OPERATION\n");
+			printf("first child type %d\n",node->children[0]->type);
+			error = semantic(node->children[0], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+			error = semantic(node->children[1], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			//se chegar aqui tem dois filhos com data type preenchido
+			leftSideType = node->children[0]->dataType;
+			rightSideType = node->children[1]->dataType;
+
+			coercionType = tryCoercion(leftSideType, rightSideType);
+			if(!coercionType) {
+				return SEMANTIC_ERROR;
+			}
+			printf("(%d) + (%d) -> (%d)\n",leftSideType, rightSideType, coercionType);
+			node->dataType = coercionType;//falta fazer coercion e checks disso
+
+			return SEMANTIC_SUCCESS;
+			break;
+
 		case AST_SUB:
+			printf("semantic AST_BINARY MATH OPERATION\n");
+			printf("first child type %d\n",node->children[0]->type);
+			error = semantic(node->children[0], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+			error = semantic(node->children[1], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			//se chegar aqui tem dois filhos com data type preenchido
+			leftSideType = node->children[0]->dataType;
+			rightSideType = node->children[1]->dataType;
+
+			coercionType = tryCoercion(leftSideType, rightSideType);
+			if(!coercionType) {
+				return SEMANTIC_ERROR;
+			}
+			printf("(%d) + (%d) -> (%d)\n",leftSideType, rightSideType, coercionType);
+			node->dataType = coercionType;//falta fazer coercion e checks disso
+
+			return SEMANTIC_SUCCESS;
+			break;
+
 		case AST_ADD:
 			printf("semantic AST_BINARY MATH OPERATION\n");
 			printf("first child type %d\n",node->children[0]->type);
@@ -548,7 +703,7 @@ int semantic(AST *node, map_t* scope) {
 			leftSideType = node->children[0]->dataType;
 			rightSideType = node->children[1]->dataType;
 
-			int coercionType = tryCoercion(leftSideType, rightSideType);
+			coercionType = tryCoercion(leftSideType, rightSideType);
 			if(!coercionType) {
 				return SEMANTIC_ERROR;
 			}
@@ -556,46 +711,277 @@ int semantic(AST *node, map_t* scope) {
 			node->dataType = coercionType;//falta fazer coercion e checks disso
 
 			return SEMANTIC_SUCCESS;
+			break;
 		
 		case AST_LESS:
 			printf("semantic AST_LESS\n");
-			// semantic(node->children[0]);
-			// semantic(node->children[1]);
+			error = semantic(node->children[0], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			identifier = node->symbol->key;
+			valueNode = node->children[0];
+			literalDataType = valueNode->dataType;
+
+			if(!(literalDataType==LIT_INTEGER || literalDataType==LIT_REAL)) {
+				printf("Operand has to be integer(%d) or float(%d). It is %d.\n",LIT_INTEGER,LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			error = semantic(node->children[1], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			valueNode = node->children[1];
+			literalDataType = valueNode->dataType;
+
+			if(!(literalDataType==LIT_INTEGER || literalDataType==LIT_REAL)) {
+				printf("Operand has to be integer(%d) or float(%d). It is %d.\n",LIT_INTEGER,LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			node->dataType=LIT_INTEGER;
+
+			return SEMANTIC_SUCCESS;
 			break;
 		case AST_GREATER:
 			printf("semantic AST_GREATER\n");
-			// semantic(node->children[0]);
-			// semantic(node->children[1]);
+			error = semantic(node->children[0], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			identifier = node->symbol->key;
+			valueNode = node->children[0];
+			literalDataType = valueNode->dataType;
+
+			if(!(literalDataType==LIT_INTEGER || literalDataType==LIT_REAL)) {
+				printf("Operand has to be integer(%d) or float(%d). It is %d.\n",LIT_INTEGER,LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			error = semantic(node->children[1], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			valueNode = node->children[1];
+			literalDataType = valueNode->dataType;
+
+			if(!(literalDataType==LIT_INTEGER || literalDataType==LIT_REAL)) {
+				printf("Operand has to be integer(%d) or float(%d). It is %d.\n",LIT_INTEGER,LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			node->dataType=LIT_INTEGER;
+
+			return SEMANTIC_SUCCESS;
 			break;
+
 		case AST_LESS_EQ:
 			printf("semantic AST_LESS_EQ\n");
-			// semantic(node->children[0]);
-			// semantic(node->children[1]);
+			error = semantic(node->children[0], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			identifier = node->symbol->key;
+			valueNode = node->children[0];
+			literalDataType = valueNode->dataType;
+
+			if(!(literalDataType==LIT_INTEGER || literalDataType==LIT_REAL)) {
+				printf("Operand has to be integer(%d) or float(%d). It is %d.\n",LIT_INTEGER,LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			error = semantic(node->children[1], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			valueNode = node->children[1];
+			literalDataType = valueNode->dataType;
+
+			if(!(literalDataType==LIT_INTEGER || literalDataType==LIT_REAL)) {
+				printf("Operand has to be integer(%d) or float(%d). It is %d.\n",LIT_INTEGER,LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			node->dataType=LIT_INTEGER;
+
+			return SEMANTIC_SUCCESS;
 			break;
+
 		case AST_GREATER_EQ:
 			printf("semantic AST_GREATER_EQ\n");
-			// semantic(node->children[0]);
-			// semantic(node->children[1]);
+			error = semantic(node->children[0], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			identifier = node->symbol->key;
+			valueNode = node->children[0];
+			literalDataType = valueNode->dataType;
+
+			if(!(literalDataType==LIT_INTEGER || literalDataType==LIT_REAL)) {
+				printf("Operand has to be integer(%d) or float(%d). It is %d.\n",LIT_INTEGER,LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			error = semantic(node->children[1], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			valueNode = node->children[1];
+			literalDataType = valueNode->dataType;
+
+			if(!(literalDataType==LIT_INTEGER || literalDataType==LIT_REAL)) {
+				printf("Operand has to be integer(%d) or float(%d). It is %d.\n",LIT_INTEGER,LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			node->dataType=LIT_INTEGER;
+
+			return SEMANTIC_SUCCESS;
 			break;
+
 		case AST_EQ:
 			printf("semantic AST_EQ\n");
-			// semantic(node->children[0]);
-			// semantic(node->children[1]);
+			error = semantic(node->children[0], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			identifier = node->symbol->key;
+			valueNode = node->children[0];
+			literalDataType = valueNode->dataType;
+
+			if(!(literalDataType==LIT_INTEGER || literalDataType==LIT_REAL)) {
+				printf("Operand has to be integer(%d) or float(%d). It is %d.\n",LIT_INTEGER,LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			error = semantic(node->children[1], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			valueNode = node->children[1];
+			literalDataType = valueNode->dataType;
+
+			if(!(literalDataType==LIT_INTEGER || literalDataType==LIT_REAL)) {
+				printf("Operand has to be integer(%d) or float(%d). It is %d.\n",LIT_INTEGER,LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			node->dataType=LIT_INTEGER;
+
+			return SEMANTIC_SUCCESS;
 			break;
+
 		case AST_NEQ:
 			printf("semantic AST_NEQ\n");
-			// semantic(node->children[0]);
-			// semantic(node->children[1]);
+			error = semantic(node->children[0], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			identifier = node->symbol->key;
+			valueNode = node->children[0];
+			literalDataType = valueNode->dataType;
+
+			if(!(literalDataType==LIT_INTEGER || literalDataType==LIT_REAL)) {
+				printf("Operand has to be integer(%d) or float(%d). It is %d.\n",LIT_INTEGER,LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			error = semantic(node->children[1], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			valueNode = node->children[1];
+			literalDataType = valueNode->dataType;
+
+			if(!(literalDataType==LIT_INTEGER || literalDataType==LIT_REAL)) {
+				printf("Operand has to be integer(%d) or float(%d). It is %d.\n",LIT_INTEGER,LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			node->dataType=LIT_INTEGER;
+
+			return SEMANTIC_SUCCESS;
 			break;
+
 		case AST_AND:
 			printf("semantic AST_AND\n");
-			// semantic(node->children[0]);
-			// semantic(node->children[1]);
+			error = semantic(node->children[0], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			identifier = node->symbol->key;
+			valueNode = node->children[0];
+			literalDataType = valueNode->dataType;
+
+			if(!(literalDataType==LIT_INTEGER || literalDataType==LIT_REAL)) {
+				printf("Operand has to be integer(%d) or float(%d). It is %d.\n",LIT_INTEGER,LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			error = semantic(node->children[1], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			valueNode = node->children[1];
+			literalDataType = valueNode->dataType;
+
+			if(!(literalDataType==LIT_INTEGER || literalDataType==LIT_REAL)) {
+				printf("Operand has to be integer(%d) or float(%d). It is %d.\n",LIT_INTEGER,LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			node->dataType=LIT_INTEGER;
+
+			return SEMANTIC_SUCCESS;
 			break;
+
 		case AST_OR:
 			printf("semantic AST_OR\n");
-			// semantic(node->children[0]);
-			// semantic(node->children[1]);
+			error = semantic(node->children[0], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			identifier = node->symbol->key;
+			valueNode = node->children[0];
+			literalDataType = valueNode->dataType;
+
+			if(!(literalDataType==LIT_INTEGER || literalDataType==LIT_REAL)) {
+				printf("Operand has to be integer(%d) or float(%d). It is %d.\n",LIT_INTEGER,LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			error = semantic(node->children[1], scope);
+			if (error) {
+				return SEMANTIC_ERROR;
+			}
+
+			valueNode = node->children[1];
+			literalDataType = valueNode->dataType;
+
+			if(!(literalDataType==LIT_INTEGER || literalDataType==LIT_REAL)) {
+				printf("Operand has to be integer(%d) or float(%d). It is %d.\n",LIT_INTEGER,LIT_INTEGER,literalDataType);
+				return SEMANTIC_ERROR;
+			}
+
+			node->dataType=LIT_INTEGER;
+
+			return SEMANTIC_SUCCESS;
 			break;
 
 		default:
