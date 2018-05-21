@@ -46,10 +46,12 @@ int main(int argc, char *argv[]) {
 	}
 	astPrint(root,0);
 
-	if(semantic(root, programScope) != 0) {
+	int semanticResult = semantic(root, programScope);
+	printf("result = %d\n", semanticResult);
+	if( semanticResult != 0) {
 		printf("Algum erro na verificacao semantica.\n");
 	} else {
 		printf("Sucesso na verificacao semantica.\n");
 	}
-	exit(0);
+	exit(semanticResult);
 }

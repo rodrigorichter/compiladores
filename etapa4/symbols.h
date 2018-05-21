@@ -34,7 +34,6 @@ typedef struct symbol_s
     map_t scope;
 } symbol_t;
 
-
 map_t scannedSymbolsMap;
 map_t programScope;
 
