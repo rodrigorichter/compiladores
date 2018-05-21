@@ -11,25 +11,25 @@ etapa4: hashmap.o y.tab.o symbols.o lex.yy.o ast.o decompiler.o semantic.o main.
 	gcc -o etapa4  y.tab.o lex.yy.o symbols.o hashmap.o ast.o decompiler.o semantic.o main.o
 
 main.o: main.c
-	gcc -c main.c
+	gcc -c main.c -Wall
 hashmap.o: hashmap.c
-	gcc -c hashmap.c
+	gcc -c hashmap.c -Wall
 symbols.o: symbols.c
-	gcc -c symbols.c
+	gcc -c symbols.c -Wall
 ast.o: ast.c
-	gcc -c ast.c
+	gcc -c ast.c -Wall
 decompiler.o: decompiler.c
-	gcc -c decompiler.c
+	gcc -c decompiler.c -Wall
 semantic.o: semantic.c
-	gcc -c semantic.c
+	gcc -c semantic.c -Wall
 
 y.tab.o: y.tab.c
-	gcc -c y.tab.c
+	gcc -c y.tab.c -Wall
 y.tab.c: parser.y
 	yacc parser.y -d
 
 lex.yy.o: lex.yy.c
-	gcc -c lex.yy.c
+	gcc -c lex.yy.c -Wall
 lex.yy.c: scanner.l symbols.c hashmap.c 
 	lex scanner.l
 
