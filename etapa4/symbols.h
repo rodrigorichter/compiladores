@@ -30,7 +30,7 @@ typedef struct symbol_s
 
 	int isFunction;
     int argCount;
-	void* parameters[MAX_PARAMS_COUNT];
+	void* parameters[MAX_PARAMS_COUNT]; //symbols
     map_t scope;
 } symbol_t;
 

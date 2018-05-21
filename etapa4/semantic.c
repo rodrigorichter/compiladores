@@ -20,7 +20,7 @@ int literalDataTypeFromKeyword(int keyword) {
 		case KW_CHAR: return LIT_CHAR;
 		case KW_FLOAT: return LIT_REAL;
 		default: 
-			printf("CAIU NO DEFAUL DO TIPO\n");
+			printf("literalDataTypeFromKeyword não pode converter tipo (%d)\n", keyword);
 			return 0;
 	}
 }
@@ -30,7 +30,7 @@ int typeCanTakeliteralDataType(int type, int literalDataType) {
 	type=literalDataTypeFromKeyword(type);
 	switch (type) {
 		case LIT_INTEGER:
-			return (literalDataType == LIT_INTEGER);
+			return (literalDataType == LIT_INTEGER || literalDataType == LIT_CHAR);
 		case LIT_REAL:
 			return (literalDataType == LIT_REAL || literalDataType == LIT_INTEGER);
 		case LIT_CHAR:
@@ -100,7 +100,8 @@ int semantic(AST *node, map_t* scope) {
 			valueNode = node->children[0];
 			literalDataType = valueNode->symbol->type;
 
-			if ( ! typeCanTakeliteralDataType(type, literalDataType) ) {
+			if(! typeCanTakeliteralDataType(type, literalDataType)) {
+			// if ( literalDataTypeFromKeyword(type) != literalDataType) {
 				printf("declarou um %d, mas forneceu um %d\n",type,literalDataType);
 				return SEMANTIC_ERROR;
 			}
@@ -148,7 +149,7 @@ int semantic(AST *node, map_t* scope) {
 				}
 
 				literalDataType = listNode->children[0]->symbol->type;
-				if ( ! typeCanTakeliteralDataType(type, literalDataType) ) {
+				if ( literalDataTypeFromKeyword(type) != literalDataType) {
 					printf("declarou um %d, mas forneceu um %d\n",type,literalDataType);
 					return SEMANTIC_ERROR;
 				}
@@ -199,6 +200,7 @@ int semantic(AST *node, map_t* scope) {
 			printf("semantic AST_DEC_FUNC\n");
 			
 			literalDataType = literalDataTypeFromKeyword(node->dataType);
+
 			identifier = node->symbol->stringValue;
 			declaredSymbol = getSymbol(programScope, identifier);
 			if(declaredSymbol) {
@@ -212,6 +214,8 @@ int semantic(AST *node, map_t* scope) {
 
 			map_t functionScope = newMap();
 			declaredSymbol->scope = functionScope;
+
+			addSymbol(functionScope, literalDataType, "_return_type_", 0);
 
 			listNode = node->children[0];//param_list
 			argCount = 0;
@@ -227,6 +231,7 @@ int semantic(AST *node, map_t* scope) {
 					return SEMANTIC_ERROR;
 				}
 				paramSymbol = addSymbol(functionScope, literalDataType, identifier, node->symbol->line);
+				paramSymbol->dataType = literalDataType;
 				declaredSymbol->parameters[argCount] = paramSymbol;
 				
 				argCount++;
@@ -234,20 +239,6 @@ int semantic(AST *node, map_t* scope) {
 			}
 			declaredSymbol->argCount = argCount;
 			return  semantic(node->children[1], functionScope);//passa escopo pro bloco
-
-		// case AST_PARAM_LIST://desnecessário?
-		// 	printf("semantic AST_PARAM_LIST\n");
-		// 	break;
-
-		// case AST_PARAM://desnecessário?
-		// 	printf("semantic AST_PARAM, %s\n", node->symbol->key);
-		// 	break;
-
-		// case AST_VALUE_LIST://desnecessário?
-		// 	printf("semantic AST_VALUE_LIST\n");
-		// 	semantic(node->children[0], programScope);
-		// 	semantic(node->children[1], programScope);
-		// 	break;
 
 		case AST_SYMBOL:
 			printf("semantic AST_SYMBOL, %s\n", node->symbol->key);
@@ -264,6 +255,7 @@ int semantic(AST *node, map_t* scope) {
 				return SEMANTIC_ERROR;
 			}
 			node->dataType = declaredSymbol->type;
+			printf("semantic AST_SYMBOL, %s, tipo %d\n", node->symbol->key, node->dataType);
 			return SEMANTIC_SUCCESS;
 
 		// case AST_TYPECHAR://desnecessário?
@@ -431,8 +423,22 @@ int semantic(AST *node, map_t* scope) {
 
 		case AST_RETURN:
 			printf("semantic AST_RETURN\n");
-			// semantic(node->children[0]);
-			break;
+			error = semantic(node->children[0], scope);
+			if(error) {
+				return error;
+			}
+			symbol_t *returnSymbol = getSymbol(scope, "_return_type_");
+			if(!returnSymbol) {
+				printf("Não encontrou return symbol\n");
+				return SEMANTIC_ERROR;
+			}
+
+			printf("esperado (%d), recebido (%d)\n", returnSymbol->type, node->children[0]->dataType);
+			if(node->children[0]->dataType != returnSymbol->type) {
+				printf("Retornou tipo errado\n");
+				return SEMANTIC_ERROR;
+			}
+			return SEMANTIC_SUCCESS;
 
 		case AST_IF_THEN:
 			printf("semantic AST_IF_THEN\n");
@@ -528,73 +534,60 @@ int semantic(AST *node, map_t* scope) {
 		case AST_INVOKE_FUNC:
 			printf("semantic AST_INVOKE_FUNC, %s\n", node->symbol->key);
 			
-			// identifier = node->symbol->key;
-			// declaredSymbol = getSymbolInScopes(scope, programScope, identifier);
-			// if(!declaredSymbol) {
-			// 	printf("Simblo não declarado.\n");
-			// 	return SEMANTIC_ERROR;
-			// }
-			// node->dataType = declaredSymbol->type;
-			// if (!declaredSymbol->isFunction) {
-			// 	printf("Simbolo não é função\n");
-			// 	return SEMANTIC_ERROR;
-			// }
+			identifier = node->symbol->key;
+			declaredSymbol = getSymbolInScopes(scope, programScope, identifier);
+			if(!declaredSymbol) {
+				printf("Simblo não declarado.\n");
+				return SEMANTIC_ERROR;
+			}
+			node->dataType = declaredSymbol->type;
+			if (!declaredSymbol->isFunction) {
+				printf("Simbolo não é função\n");
+				return SEMANTIC_ERROR;
+			}
 
-			// listNode = node->children[0];//arg_list
-			// argCount = 0;
-			// while(listNode) { //enquanto tem arg_list
-				// valueNode = listNode->children[0];//pega symbol
-				// literalDataType = literalDataTypeFromKeyword(valueNode->dataType); //pega tipo do param
+			listNode = node->children[0];//arg_list
+			argCount = 0;
+			while(listNode) { //enquanto tem arg_list
+				if(argCount >= declaredSymbol->argCount) {
+					printf("Argumentos demais.\n");
+					return SEMANTIC_ERROR;
+				}
+				valueNode = listNode->children[0];//pega symbol
+				error = semantic(valueNode, scope);
+				if(error) {
+					printf("Problema em um argumento\n");
+					return error;
+				}
+				
+				literalDataType = valueNode->dataType; //pega tipo do param
+				
+				symbol_t *param = (symbol_t*)declaredSymbol->parameters[argCount];
+				printf("arg: (%d) - param (%d)",literalDataType,param->dataType);
+				if(literalDataType != param->dataType) {
+					printf("Argumento com tipo diferente do esperado.\n");
+					return SEMANTIC_ERROR;
+				}
+				//tem que ser igual ao que a função espera
+
 				// identifier = valueNode->symbol->key;
-			// 	printf("parametro %d, %s, tipo %d\n",argCount, identifier,literalDataType);
+				// printf("parametro %d, %s, tipo %d\n",argCount, identifier,literalDataType);
 
-			// 	symbol_t *paramSymbol = getSymbol(functionScope, identifier);
-			// 	if(paramSymbol) {
-			// 		printf("Simbolo já declarado na funcao\n");
-			// 		return SEMANTIC_ERROR;
-			// 	}
-			// 	paramSymbol = addSymbol(functionScope, literalDataType, identifier, node->symbol->line);
-			// 	declaredSymbol->parameters[argCount] = paramSymbol;
+				// symbol_t *paramSymbol = getSymbolInScopes(scope, programScope, identifier);
+				// if(!paramSymbol) {
+				// 	printf("Simbolo não declarado\n");
+				// 	return SEMANTIC_ERROR;
+				// }
+				// paramSymbol = addSymbol(functionScope, literalDataType, identifier, node->symbol->line);
+				// declaredSymbol->parameters[argCount] = paramSymbol;
 				
-			// 	argCount++;
-			// 	listNode = listNode->children[1];
-			// }
-			// declaredSymbol->argCount = argCount;
-			// return  semantic(node->children[1], functionScope);//passa escopo pro bloco
-
-
-
-
-			
-			
-			// valueNode = node->children[0];//arg_list
-			// if(!valueNode) {
-			// 	if(declaredSymbol->argCount > 0) {
-			// 		printf("Faltando argumentos\n");
-			// 		return SEMANTIC_ERROR;
-			// 	}
-			// 	return SEMANTIC_SUCCESS;
-			// }
-			// int currentParameterIndex = 0;
-			// symbol_t *currentParameterToMatch = declaredSymbol->parameters[currentParameterIndex];
-			// while(valueNode) {//arg_list
-			// 	currentParameterToMatch = declaredSymbol->parameters[currentParameterIndex];
-			// 	error = semantic(valueNode->children[0], scope);
-			// 	if(error) {
-			// 		printf("Simbolo não encontrado\n");
-			// 		return SEMANTIC_ERROR;
-			// 	}/////////////////////////////////
-
-			// 	if(valueNode->children[1]->type != AST_ARG_LIST) {
-			// 		error = semantic(valueNode->children[0], scope);
-			// 		if(error) {
-			// 			printf("Simbolo não encontrado\n");
-			// 			return SEMANTIC_ERROR;
-			// 		}					
-			// 	}
-				
-			// }
-
+				argCount++;
+				listNode = listNode->children[1];
+			}
+			if(argCount < declaredSymbol->argCount) {
+				printf("Faltaram argumentos.\n");
+				return SEMANTIC_ERROR;
+			}
 			return SEMANTIC_SUCCESS;
 			
 		case AST_ARG_LIST:
