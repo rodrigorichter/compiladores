@@ -21,6 +21,9 @@ symbol_t* addSymbol(map_t *map, int type, char* key, int line) {
 	symbol->line = line;
 	symbol->type = type;
 	symbol->dataType = 0;
+	symbol->isArray=0;
+	symbol->isPointer=0;
+	symbol->isFunction=0;
 
 	char *ptr;
 

@@ -1,14 +1,27 @@
-int a = 'a';
-/*
+int b='l';
 int a = 0;
-int main(int b, int c) {
- 	a = main(a,b);
- 	return bfl;
+int c[10];
+char wow=5;
+int func1() {
+  wow='a';
+  2=a;
 }
-
-int a=2;
+/*
+int i=2;
 float d=4.123;
 int #pt = 0;
+int v[10];
+
+int incn (int x, int n)
+  {
+  return x+n;
+  }
+
+int voidfunc()
+  {
+  }
+  
+
 
 int main() {
   a = 10;
@@ -17,7 +30,7 @@ int main() {
   v[2] = v[10-1];
   for (i = 1 to 10)
     print i " ";
-}
+
 
   print " Digite um numero: \n";
   read i;
@@ -37,15 +50,6 @@ int main() {
   ;;;
   {;};
   {}
-  }
 
-int incn (int x, int n)
-  {
-  return x+n;
-  }
-
-int voidfunc()
-  {
-  }
-  
+}
 */

@@ -19,6 +19,9 @@ int literalDataTypeFromKeyword(int keyword) {
 		case KW_INT: return LIT_INTEGER;
 		case KW_CHAR: return LIT_CHAR;
 		case KW_FLOAT: return LIT_REAL;
+		case LIT_INTEGER: return LIT_INTEGER;
+		case LIT_CHAR: return LIT_CHAR;
+		case LIT_REAL: return LIT_REAL;
 		default: 
 			printf("literalDataTypeFromKeyword não pode converter tipo (%d)\n", keyword);
 			return 0;
@@ -30,11 +33,9 @@ int typeCanTakeliteralDataType(int type, int literalDataType) {
 	type=literalDataTypeFromKeyword(type);
 	switch (type) {
 		case LIT_INTEGER:
-			return (literalDataType == LIT_INTEGER || literalDataType == LIT_CHAR);
 		case LIT_REAL:
-			return (literalDataType == LIT_REAL || literalDataType == LIT_INTEGER);
 		case LIT_CHAR:
-			return (literalDataType == LIT_CHAR || literalDataType == LIT_INTEGER);
+			return (literalDataType == LIT_INTEGER || literalDataType == LIT_CHAR || literalDataType == LIT_REAL);
 		default:
 			return 0;
 	}
@@ -133,6 +134,7 @@ int semantic(AST *node, map_t* scope) {
 			declaredSymbol = addSymbol(programScope, literalDataType, identifier, node->symbol->line);
 			declaredSymbol->isArray = 1;
 			declaredSymbol->arrayCapacity = size;
+
 			return SEMANTIC_SUCCESS;
 
 		case AST_DEC_VECTOR_INIT:
@@ -240,6 +242,8 @@ int semantic(AST *node, map_t* scope) {
 			declaredSymbol->argCount = argCount;
 			return  semantic(node->children[1], functionScope);//passa escopo pro bloco
 
+		case AST_SYMBOL_ADDRESS:
+		case AST_SYMBOL_POINTER:
 		case AST_SYMBOL:
 			printf("semantic AST_SYMBOL, %s\n", node->symbol->key);
 			type = node->symbol->type;
@@ -256,6 +260,17 @@ int semantic(AST *node, map_t* scope) {
 			}
 			node->dataType = declaredSymbol->type;
 			printf("semantic AST_SYMBOL, %s, tipo %d\n", node->symbol->key, node->dataType);
+
+			if (declaredSymbol->isArray) {
+				printf("Erro: Vetor deve ser usado somente com indexacao\n");
+				return SEMANTIC_ERROR;
+			}
+
+			if (declaredSymbol->isFunction) {
+				printf("Erro: Funcao deve ser usada somente com argumentos\n");
+				return SEMANTIC_ERROR;
+			}
+
 			return SEMANTIC_SUCCESS;
 
 		// case AST_TYPECHAR://desnecessário?
@@ -270,13 +285,6 @@ int semantic(AST *node, map_t* scope) {
 		// 	printf("semantic AST_TYPEFLOAT, %s\n", node->symbol->key);
 		// 	break;
 
-		// case AST_SYMBOL_ADDRESS://desnecessário?
-		// 	printf("semantic AST_SYMBOL_ADDRESS, %s\n", node->symbol->key);
-		// 	break;
-
-		// case AST_SYMBOL_POINTER://desnecessário?
-		// 	printf("semantic AST_SYMBOL_POINTER, %s\n", node->symbol->key);
-		// 	break;
 
 		case AST_BLOCK:
 			printf("semantic AST_BLOCK\n");
@@ -319,6 +327,17 @@ int semantic(AST *node, map_t* scope) {
 				printf("declarou um %d, mas forneceu um %d\n", type, literalDataType);
 				return SEMANTIC_ERROR;
 			}
+
+			if(declaredSymbol->isArray) {
+				printf("Erro: Vetor nao pode ser usado sem indexacao\n");
+				return SEMANTIC_ERROR;
+			}
+
+			if(declaredSymbol->isFunction) {
+				printf("Erro: Funcao deve ser usada somente com argumentos\n");
+				return SEMANTIC_ERROR;
+			}
+
 			return SEMANTIC_SUCCESS;
 
 		case AST_VECTOR_ASS:
@@ -357,6 +376,17 @@ int semantic(AST *node, map_t* scope) {
 				printf("declarou um %d, mas forneceu um %d\n", type, literalDataType);
 				return SEMANTIC_ERROR;
 			}
+
+			if(!declaredSymbol->isArray) {
+				printf("Erro: Variavel nao pode ser indexada\n");
+				return SEMANTIC_ERROR;
+			}
+
+			if(declaredSymbol->isFunction) {
+				printf("Erro: Funcao nao pode ser indexada\n");
+				return SEMANTIC_ERROR;
+			}
+
 			return SEMANTIC_SUCCESS;
 
 			break;
@@ -369,7 +399,7 @@ int semantic(AST *node, map_t* scope) {
 			}
 			valueNode = node->children[0];
 			literalDataType = valueNode->dataType;
-
+			
 			if(literalDataType!=LIT_INTEGER) {
 				printf("Vector index has to be integer(%d). It is %d.\n",LIT_INTEGER,literalDataType);
 				return SEMANTIC_ERROR;
@@ -386,10 +416,12 @@ int semantic(AST *node, map_t* scope) {
 			type = declaredSymbol->type;
 			node->dataType=type;
 
+			if(!declaredSymbol->isArray) {
+				printf("Erro: Variavel nao pode ser indexada\n");
+				return SEMANTIC_ERROR;
+			}
+
 			return SEMANTIC_SUCCESS;
-
-
-			break;
 
 		case AST_READ:
 			printf("semantic AST_READ, %s\n", node->symbol->key);
@@ -404,7 +436,6 @@ int semantic(AST *node, map_t* scope) {
 			}
 
 			return SEMANTIC_SUCCESS;
-			break;
 
 		case AST_ELEM_LIST:
 			printf("semantic AST_ELEM_LIST\n");
@@ -419,7 +450,6 @@ int semantic(AST *node, map_t* scope) {
 			}
 
 			return SEMANTIC_SUCCESS;
-			break;
 
 		case AST_RETURN:
 			printf("semantic AST_RETURN\n");
