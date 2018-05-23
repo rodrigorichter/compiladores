@@ -1,11 +1,63 @@
-int b='l';
+char b='l';
 int a = 0;
-int c[10];
-char wow=5;
+//int a=4; // ERRO
+float c[10];
+int aux=0;
+int #pt=0;
+
 int func1() {
-  wow='a';
-  2=a;
+  aux=a;
+  //aux=inexistente; // ERRO
+  //aux=a[0]; // ERRO
+  //a[0]=aux; // ERRO
+
+  c[0]=a;
+  a=c[0];
+  //c=a; // ERRO
+  //a=c; // ERRO
+
+  a=func1();
+  //a=func1 // ERRO
+
+  a=c[a];
+  a=c[2];
+  a=c[a+3];
+  //a=c[a+3.5]; //ERRO
+  //a=c[2+3.5]; //ERRO
+
+  //a=pt-2; // ERRO
+  //a=2-pt; // ERRO
+  a=2+pt;
+  a=pt+2;
+
+  a=#pt;
+  a=pt;
+  #a=pt;
+  #pt=a;
+  pt=a;
+  pt=#a;
+
+  print "Hello World" a b c[2];
 }
+
+int abe=0;
+char ace=0;
+float ade=0;
+
+int func2(int oi, char eae, float dale) {
+  a=func2(ace, ade, abe);
+}
+
+int func3() {
+  return 0;
+}
+
+/*int func4() {
+  return 0.5;
+}*/ // ERRO
+
+
+
 /*
 int i=2;
 float d=4.123;

@@ -199,6 +199,8 @@ cmd:
 	|
 	TK_IDENTIFIER '=' expr {$$ = astCreate(AST_VALUE_ASS,$1,$3,0,0,0);}
 	|
+	'#' TK_IDENTIFIER '=' expr {$$ = astCreate(AST_VALUE_ASS,$2,$4,0,0,0);}
+	|
 	TK_IDENTIFIER '[' expr ']' '=' expr {$$ = astCreate(AST_VECTOR_ASS,$1, $3,$6,0,0);}
 	|
 	KW_READ TK_IDENTIFIER {$$ = astCreate(AST_READ,$2,0,0,0,0);}

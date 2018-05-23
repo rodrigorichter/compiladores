@@ -242,8 +242,8 @@ int semantic(AST *node, map_t* scope) {
 			declaredSymbol->argCount = argCount;
 			return  semantic(node->children[1], functionScope);//passa escopo pro bloco
 
-		case AST_SYMBOL_ADDRESS:
 		case AST_SYMBOL_POINTER:
+		case AST_SYMBOL_ADDRESS:
 		case AST_SYMBOL:
 			printf("semantic AST_SYMBOL, %s\n", node->symbol->key);
 			type = node->symbol->type;
@@ -594,7 +594,7 @@ int semantic(AST *node, map_t* scope) {
 				
 				symbol_t *param = (symbol_t*)declaredSymbol->parameters[argCount];
 				printf("arg: (%d) - param (%d)",literalDataType,param->dataType);
-				if(literalDataType != param->dataType) {
+				if(!typeCanTakeliteralDataType(param->dataType,literalDataType)) {
 					printf("Argumento com tipo diferente do esperado.\n");
 					return SEMANTIC_ERROR;
 				}
@@ -665,6 +665,27 @@ int semantic(AST *node, map_t* scope) {
 				return SEMANTIC_ERROR;
 			}
 			node->dataType = coercionType;//falta fazer coercion e checks disso
+			if(node->type!=AST_ADD) {
+				type = node->children[0]->symbol->type;
+				if(type == TK_IDENTIFIER) {
+					identifier = node->children[0]->symbol->key;
+					declaredSymbol = getSymbolInScopes(scope, programScope, identifier);
+					if(declaredSymbol->isPointer) {
+						printf("Erro: A unica operacao permitida com ponteiros eh soma\n");
+						return SEMANTIC_ERROR;
+					}
+				}
+				type = node->children[1]->symbol->type;
+				if(type == TK_IDENTIFIER) {
+					identifier = node->children[1]->symbol->key;
+					declaredSymbol = getSymbolInScopes(scope, programScope, identifier);
+					if(declaredSymbol->isPointer) {
+						printf("Erro: A unica operacao permitida com ponteiros eh soma\n");
+						return SEMANTIC_ERROR;
+					}
+				}
+			}
+				
 
 			return SEMANTIC_SUCCESS;
 			

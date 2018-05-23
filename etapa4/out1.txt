@@ -1,0 +1,32 @@
+char b = 'l';
+int a = 0;
+float c[10];
+int aux = 0;
+int #pt = 0;
+int func1() {
+aux = a;
+c[0] = a;
+a = c[0];
+a = func1();
+a = c[a];
+a = c[2];
+a = c[a + 3];
+a = 2 + pt;
+a = pt + 2;
+a = #pt;
+a = pt;
+a = pt;
+pt = a;
+pt = a;
+pt = #a;
+print "Hello World" a b c[2] ;
+}
+int abe = 0;
+char ace = 0;
+float ade = 0;
+int func2(int oi, char eae, float dale) {
+a = func2(ace, ade, abe);
+}
+int func3() {
+return 0;
+}
