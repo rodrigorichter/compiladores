@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+TAC* makeBinOp(int type, TAC* sonCode0, TAC* sonCode1);
+TAC* makeIfThen(TAC* sonCode0, TAC* sonCode1);
+TAC* makeIfThenElse(TAC* sonCode0, TAC* sonCode1, TAC* sonCode2);
+TAC* makeWhile(TAC* sonCode0, TAC* sonCode1);
+
 TAC* tacCreate(int type, symbol_t* res, symbol_t* op1, symbol_t* op2) {
 	TAC* newTac;
 	newTac = (TAC*) calloc(1,sizeof(TAC));
@@ -32,18 +37,32 @@ TAC* tacPrintSingle(TAC* tac) {
 	fprintf(stderr, "TAC(");
 
 	switch(tac->type) {
-		case TAC_DEC_VALUE:
-			fprintf(stderr, "TAC_DEC_VALUE");
-			break;
-		case TAC_BEGIN_FUNC:
-			fprintf(stderr, "TAC_BEGIN_FUNC");
-			break;
-		case TAC_DEC_LIST:
-			fprintf(stderr, "TAC_DEC_LIST");
-			break;
-		case TAC_END_FUNC:
-			fprintf(stderr, "TAC_END_FUNC");
-			break;
+		case TAC_DEC_VALUE:	fprintf(stderr, "TAC_DEC_VALUE");	break;
+		case TAC_BEGIN_FUNC:fprintf(stderr, "TAC_BEGIN_FUNC");	break;
+		case TAC_DEC_LIST:	fprintf(stderr, "TAC_DEC_LIST");	break;
+		case TAC_END_FUNC:	fprintf(stderr, "TAC_END_FUNC");	break;
+		case TAC_MOVE:		fprintf(stderr, "TAC_MOVE");		break;
+
+		case TAC_ADD:		fprintf(stderr, "TAC_ADD");			break;
+		case TAC_SUB:		fprintf(stderr, "TAC_SUB");			break;
+		case TAC_MULT:		fprintf(stderr, "TAC_MULT");		break;
+		case TAC_DIV:		fprintf(stderr, "TAC_DIV");			break;
+
+		case TAC_NOT:		fprintf(stderr, "TAC_NOT");			break;
+		case TAC_OR:		fprintf(stderr, "TAC_OR");			break;
+		case TAC_AND:		fprintf(stderr, "TAC_AND");			break;
+		case TAC_NEQ:		fprintf(stderr, "TAC_NEQ");			break;
+		case TAC_EQ:		fprintf(stderr, "TAC_EQ");			break;
+		case TAC_GREATER_EQ:fprintf(stderr, "TAC_GREATER_EQ");	break;
+		case TAC_LESS_EQ:	fprintf(stderr, "TAC_LESS_EQ");		break;
+		case TAC_LESS:		fprintf(stderr, "TAC_LESS");		break;
+		case TAC_GREATER:	fprintf(stderr, "TAC_GREATER");		break;
+
+		case TAC_LABEL:		fprintf(stderr, "TAC_LABEL");		break;
+		case TAC_IFZERO:	fprintf(stderr, "TAC_IFZERO");		break;
+		case TAC_JUMP:		fprintf(stderr, "TAC_JUMP");		break;
+		case TAC_FUNC_CALL:	fprintf(stderr, "TAC_FUNC_CALL");	break;
+
 		default:
 			fprintf(stderr, "%d",tac->type);
 			break;
@@ -79,18 +98,42 @@ TAC* generateCode(AST* node) {
 		case AST_SYMBOL:
 			result = tacCreate(TAC_SYMBOL, node->symbol,0,0);
 			break;
+			
 		case AST_DEC_VALUE:
 			result = tacCreate(TAC_DEC_VALUE,node->symbol,0,0);
 			break;
+
 		case AST_DEC_FUNC:
-			result = tacJoin(tacJoin(tacJoin(tacCreate(TAC_BEGIN_FUNC,node->symbol,0,0),sonCode[0]),sonCode[1]),tacCreate(TAC_END_FUNC,0,0,0));
+			result = tacJoin(tacJoin(tacJoin(tacCreate(TAC_BEGIN_FUNC,node->symbol,0,0),sonCode[0]),sonCode[1]),tacCreate(TAC_END_FUNC,node->symbol,0,0));
 			break;
+
 		case AST_VALUE_ASS:
-			result = tacCreate(TAC_VALUE_ASS,sonCode[0]->res,node->symbol,0);
+			result = tacJoin(sonCode[0],tacCreate(TAC_MOVE,node->symbol,sonCode[0]?sonCode[0]->res:0,0));
 			break;
-		case AST_ADD:
-			result = tacCreate(TAC_ADD, node->symbol,0,0);
-			break;
+
+		case AST_ADD: 	result = makeBinOp(TAC_ADD,sonCode[0],sonCode[1]);	break;
+		case AST_SUB: 	result = makeBinOp(TAC_SUB,sonCode[0],sonCode[1]);	break;
+		case AST_MULT:	result = makeBinOp(TAC_MULT,sonCode[0],sonCode[1]);	break;
+		case AST_DIV:	result = makeBinOp(TAC_DIV,sonCode[0],sonCode[1]);	break;
+
+		case AST_NOT:	result = makeBinOp(TAC_NOT,sonCode[0],sonCode[1]);	break;
+		case AST_OR:	result = makeBinOp(TAC_OR,sonCode[0],sonCode[1]);	break;
+		case AST_AND:	result = makeBinOp(TAC_AND,sonCode[0],sonCode[1]);	break;
+		case AST_NEQ:	result = makeBinOp(TAC_NEQ,sonCode[0],sonCode[1]);	break;
+		case AST_EQ:			result = makeBinOp(TAC_EQ,sonCode[0],sonCode[1]);			break;
+		case AST_GREATER_EQ:	result = makeBinOp(TAC_GREATER_EQ,sonCode[0],sonCode[1]);	break;
+		case AST_LESS_EQ:		result = makeBinOp(TAC_LESS_EQ,sonCode[0],sonCode[1]);		break;
+		case AST_LESS:			result = makeBinOp(TAC_LESS,sonCode[0],sonCode[1]);			break;
+		case AST_GREATER:		result = makeBinOp(TAC_GREATER,sonCode[0],sonCode[1]);		break;
+
+		case AST_IF_THEN:		result = makeIfThen(sonCode[0],sonCode[1]);		break;
+		case AST_IF_THEN_ELSE:	result = makeIfThenElse(sonCode[0],sonCode[1],sonCode[2]);		break;
+		case AST_INVOKE_FUNC:	result = tacJoin(sonCode[0],tacCreate(TAC_FUNC_CALL,node->symbol,0,0));	break;
+		case AST_ARG_LIST:		result = tacJoin(sonCode[0],sonCode[1]);	break;
+		case AST_WHILE:			result = makeWhile(sonCode[0],sonCode[1]);	break;
+
+
+
 		default:
 			result = tacJoin(tacJoin(tacJoin(sonCode[0],sonCode[1]),sonCode[2]),sonCode[3]);
 			break;
@@ -101,7 +144,52 @@ TAC* generateCode(AST* node) {
 }
 
 TAC* makeBinOp(int type, TAC* sonCode0, TAC* sonCode1) {
-	TAC* newTac = tacCreate(TAC_ADD, makeTemp(), sonCode0?->sonCode0->res:0,sonCode1?->sonCode1->res:0);
+	TAC* newTac = tacCreate(type, makeTemp(), sonCode0?sonCode0->res:0,sonCode1?sonCode1->res:0);
 
 	return tacJoin(tacJoin(sonCode0,sonCode1),newTac);
+}
+
+TAC* makeIfThen(TAC* sonCode0, TAC* sonCode1) {
+	TAC* ifTac = 0;
+	TAC* labelTac = 0;
+	symbol_t* label = 0;
+
+	label = makeLabel();
+
+	ifTac = tacCreate(TAC_IFZERO,label,sonCode0?sonCode0->res:0,0);
+	labelTac = tacCreate(TAC_LABEL,label,0,0);
+
+	return tacJoin(tacJoin(tacJoin(sonCode0,ifTac),sonCode1),labelTac);
+}
+
+TAC* makeIfThenElse(TAC* sonCode0, TAC* sonCode1, TAC* sonCode2) {
+	TAC* ifTac = 0;
+	TAC* labelTac = 0;
+	symbol_t* label = 0;
+
+	label = makeLabel();
+
+	ifTac = tacCreate(TAC_IFZERO,label,sonCode0?sonCode0->res:0,0);
+	labelTac = tacCreate(TAC_LABEL,label,0,0);
+
+	return tacJoin(tacJoin(tacJoin(tacJoin(sonCode0,ifTac),sonCode1),labelTac),sonCode2);
+}
+
+TAC* makeWhile(TAC* sonCode0, TAC* sonCode1) {
+	TAC* ifTac = 0;
+	TAC* labelTac = 0;
+	TAC* labelTacWhile = 0;
+	TAC* jumpTac = 0;
+	symbol_t* label = 0;
+	symbol_t* labelWhile = 0;
+
+	label = makeLabel();
+	labelWhile = makeLabel();
+
+	ifTac = tacCreate(TAC_IFZERO,label,sonCode0?sonCode0->res:0,0);
+	labelTac = tacCreate(TAC_LABEL,label,0,0);
+	labelTacWhile = tacCreate(TAC_LABEL,labelWhile,0,0);
+	jumpTac = tacCreate(TAC_JUMP,labelWhile,0,0);
+
+	return tacJoin(tacJoin(tacJoin(tacJoin(tacJoin(labelTacWhile,sonCode0),ifTac),sonCode1),jumpTac),labelTac);
 }

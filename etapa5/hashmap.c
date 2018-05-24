@@ -345,6 +345,26 @@ int hashmap_iterate(map_t in, PFany f, any_t item) {
     return MAP_OK;
 }
 
+int hashmap_print(map_t in) {
+    int i;
+
+    /* Cast the hashmap */
+    hashmap_map* m = (hashmap_map*) in;
+
+    /* On empty hashmap, return immediately */
+    if (hashmap_length(m) <= 0)
+        return MAP_MISSING; 
+
+    /* Linear probing */
+    for(i = 0; i< m->table_size; i++)
+        if(m->data[i].in_use != 0) {
+            any_t data = (any_t) (m->data[i].data);
+            printDebugSymbol(data);
+        }
+
+    return MAP_OK;
+}
+
 /*
  * Remove an element with that key from the map
  */

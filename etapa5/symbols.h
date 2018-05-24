@@ -38,9 +38,13 @@ map_t scannedSymbolsMap;
 map_t programScope;
 
 void printDebugSymbol(symbol_t* symbol);
+void printSymbols(map_t *map);
 extern int initMaps();
 extern map_t newMap();
 extern symbol_t* addSymbol(map_t *map, int type, char* key, int line);
 extern symbol_t* getSymbol(map_t *map, char *key);
+
+symbol_t* makeTemp(void);
+symbol_t* makeLabel(void);
 
 #endif

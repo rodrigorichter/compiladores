@@ -66,11 +66,16 @@ symbol_t* getSymbol(map_t *map, char *key) {
 }
 
 void printDebugSymbol(symbol_t* symbol) {
-	printf("Print Symbol\n");
-	printf("Key: %s\n", symbol->key);
-	printf("Type: %d\n", symbol->type);
-	printf("DataType: %d\n", symbol->dataType);
-	printf("Line: %d\n", symbol->line);
+	printf("Printing Symbol\n");
+	printf("	-Key: %s\n", symbol->key);
+	printf("	-Type: %d\n", symbol->type);
+	printf("	-DataType: %d\n", symbol->dataType);
+	printf("	-Line: %d\n\n", symbol->line);
+	return;
+}
+
+void printSymbols(map_t *map) {
+	hashmap_print(map);
 	return;
 }
 
@@ -78,6 +83,14 @@ symbol_t* makeTemp(void) {
 	static int serialNum = 0;
 	static char buffer[64];
 
-	snprintf(buffer, "__xXxtempVarxXx123456(%d)__",serialNum++);
-	return addSymbol(**INSERIRMAPA**, LIT_INTEGER, buffer, -1);
+	snprintf(buffer, 64, "__xXxtempVarxXx123456TEMP(%d)__",serialNum++);
+	return addSymbol(programScope, LIT_INTEGER, buffer, 0);
+}
+
+symbol_t* makeLabel(void) {
+	static int serialNum = 0;
+	static char buffer[64];
+
+	snprintf(buffer, 64, "__xXxtempVarxXx123456LABEL(%d)__",serialNum++);
+	return addSymbol(programScope, LIT_INTEGER, buffer, 0);
 }

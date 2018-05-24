@@ -53,7 +53,6 @@ int main(int argc, char *argv[]) {
 	} else {
 		printf("Sucesso na verificacao semantica.\n");
 	}
-
 	tacPrintBack(generateCode(root));
 
 	exit(semanticResult);
