@@ -41,6 +41,7 @@ int yylex();
 %token <symbol>LIT_REAL      282
 %token <symbol>LIT_CHAR      285
 %token <symbol>LIT_STRING    286
+%token TYPEBOOL    287
 %token TOKEN_ERROR   290
 
 %token DT_CHAR 291
@@ -199,7 +200,7 @@ cmd:
 	|
 	TK_IDENTIFIER '=' expr {$$ = astCreate(AST_VALUE_ASS,$1,$3,0,0,0);}
 	|
-	'#' TK_IDENTIFIER '=' expr {$$ = astCreate(AST_VALUE_ASS,$2,$4,0,0,0);}
+	'#' TK_IDENTIFIER '=' expr {$$ = astCreate(AST_POINTER_ASS,$2,$4,0,0,0);}
 	|
 	TK_IDENTIFIER '[' expr ']' '=' expr {$$ = astCreate(AST_VECTOR_ASS,$1, $3,$6,0,0);}
 	|

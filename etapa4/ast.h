@@ -12,6 +12,7 @@
 #define AST_PROGRAM 5
 #define AST_VALUE_LIST 6
 #define AST_VALUE_ASS 42
+#define AST_POINTER_ASS 50
 #define AST_DEC_LIST 39
 #define AST_DEC_VECTOR 38
 #define AST_DEC_VECTOR_INIT 40

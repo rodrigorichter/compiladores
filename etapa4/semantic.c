@@ -54,6 +54,7 @@ int tryCoercion(int firstType, int secondType) {
 			if(secondType == LIT_INTEGER) {
 				return firstType;
 			}
+
 			return 0;
 		default:
 			return 0;
@@ -271,6 +272,11 @@ int semantic(AST *node, map_t* scope) {
 				return SEMANTIC_ERROR;
 			}
 
+			if(node->type==AST_SYMBOL_POINTER && !declaredSymbol->isPointer) {
+				printf("Erro: Identificador nao eh ponteiro\n");
+				return SEMANTIC_ERROR;
+			}
+
 			return SEMANTIC_SUCCESS;
 
 		// case AST_TYPECHAR://desnecessário?
@@ -302,8 +308,9 @@ int semantic(AST *node, map_t* scope) {
 			}
 			return SEMANTIC_SUCCESS;
 
+		case AST_POINTER_ASS:
 		case AST_VALUE_ASS:
-			printf("semantic AST_VALUE_ASS, %s\n", node->symbol->key);
+			printf("semantic AST_ASS, %s\n", node->symbol->key);
 
 			error = semantic(node->children[0], scope); //se tem sucesso, popula node->children[0]->dataType com o tipo resultante
 			if(error) {
@@ -336,6 +343,13 @@ int semantic(AST *node, map_t* scope) {
 			if(declaredSymbol->isFunction) {
 				printf("Erro: Funcao deve ser usada somente com argumentos\n");
 				return SEMANTIC_ERROR;
+			}
+			
+			if(declaredSymbol->isPointer && node->type!=AST_POINTER_ASS) {
+				if(node->children[0]->type!=AST_SYMBOL_ADDRESS) {
+					printf("Erro: Pode ser atribuido somente um endereco a um ponteiro\n");
+					return SEMANTIC_ERROR;
+				}
 			}
 
 			return SEMANTIC_SUCCESS;
@@ -477,7 +491,7 @@ int semantic(AST *node, map_t* scope) {
 				return error;
 			}
 
-			if (!(node->children[0]->dataType==LIT_INTEGER||node->children[0]->dataType==LIT_REAL)) {
+			if (!(node->children[0]->dataType==TYPEBOOL)) {
 				printf("Expressao de tipo invalido.\n");
 				return SEMANTIC_ERROR;
 			}
@@ -499,7 +513,7 @@ int semantic(AST *node, map_t* scope) {
 				return error;
 			}
 
-			if (!(node->children[0]->dataType==LIT_INTEGER||node->children[0]->dataType==LIT_REAL)) {
+			if (!(node->children[0]->dataType==TYPEBOOL)) {
 				printf("Expressao de tipo invalido.\n");
 				return SEMANTIC_ERROR;
 			}
@@ -526,7 +540,7 @@ int semantic(AST *node, map_t* scope) {
 				return error;
 			}
 
-			if (!(node->children[0]->dataType==LIT_INTEGER||node->children[0]->dataType==LIT_REAL)) {
+			if (node->children[0]->dataType!=TYPEBOOL) {
 				printf("Expressao de tipo invalido.\n");
 				return SEMANTIC_ERROR;
 			}
@@ -629,13 +643,13 @@ int semantic(AST *node, map_t* scope) {
 			break;
 
 		case AST_NOT:
+		case AST_AND:
+		case AST_OR:
 		case AST_GREATER:
 		case AST_LESS_EQ:
 		case AST_GREATER_EQ:
 		case AST_EQ:
 		case AST_NEQ:
-		case AST_AND:
-		case AST_OR:
 		case AST_LESS:
 		case AST_DIV:
 		case AST_MULT:
@@ -648,7 +662,7 @@ int semantic(AST *node, map_t* scope) {
 				return SEMANTIC_ERROR;
 			}
 			if (! node->children[1] ) {
-				node->dataType = node->children[0]->dataType;	
+				node->dataType = TYPEBOOL;	
 				return SEMANTIC_SUCCESS;
 			}
 			error = semantic(node->children[1], scope);
@@ -665,7 +679,24 @@ int semantic(AST *node, map_t* scope) {
 				return SEMANTIC_ERROR;
 			}
 			node->dataType = coercionType;//falta fazer coercion e checks disso
-			if(node->type!=AST_ADD) {
+
+			if(node->type==AST_GREATER ||
+				node->type==AST_LESS_EQ ||
+				node->type==AST_GREATER_EQ ||
+				node->type==AST_EQ ||
+				node->type==AST_NEQ ||
+				node->type==AST_LESS ||
+				node->type==AST_AND ||
+				node->type==AST_OR
+			) {
+				node->dataType = TYPEBOOL;
+				return SEMANTIC_SUCCESS;
+			}
+
+			if(node->type==AST_DIV ||
+				node->type==AST_MULT ||
+				node->type==AST_SUB
+			) {
 				type = node->children[0]->symbol->type;
 				if(type == TK_IDENTIFIER) {
 					identifier = node->children[0]->symbol->key;

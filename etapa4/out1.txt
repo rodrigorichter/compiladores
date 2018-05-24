@@ -5,6 +5,7 @@ int aux = 0;
 int #pt = 0;
 int func1() {
 aux = a;
+a = 2;
 c[0] = a;
 a = c[0];
 a = func1();
@@ -15,10 +16,22 @@ a = 2 + pt;
 a = pt + 2;
 a = #pt;
 a = pt;
-a = pt;
-pt = a;
-pt = a;
-pt = #a;
+Not implemented yet. ast-> 50
+;
+Not implemented yet. ast-> 50
+;
+pt = &a;
+if (3 > 5)then 
+a = 2;
+if (3 > 5)then 
+a = 2else a = 3
+;
+if (3 + 5 > 50)then 
+a = 2;
+while (a > 1)
+a = 2;
+for (a = 2 to 10)
+;
 print "Hello World" a b c[2] ;
 }
 int abe = 0;

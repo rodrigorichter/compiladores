@@ -7,6 +7,7 @@ int #pt=0;
 
 int func1() {
   aux=a;
+  a=2;
   //aux=inexistente; // ERRO
   //aux=a[0]; // ERRO
   //a[0]=aux; // ERRO
@@ -34,8 +35,22 @@ int func1() {
   a=pt;
   #a=pt;
   #pt=a;
-  pt=a;
-  pt=#a;
+  //pt=a; // ERRO
+  pt=&a;
+  //pt=#a; // ERRO
+
+  //a=3+(5>3); // ERRO
+
+  if(3>5) then a=2;
+  if(3>5) then a=2 else a=3;
+  //a=3+2<5; // ERRO
+  //if(3+5) then a=2; // ERRO
+  if(3+5>50) then a=2; // ERRO
+  //if(3+(5>50)) then a=2; // ERRO
+  //if(3+5) then a=2 else a=3;// ERRO
+  //if(3>5) then a=2>3 else a=3;// ERRO
+  while(a>1) a=2;
+  for(a=2 to 10) ;
 
   print "Hello World" a b c[2];
 }
@@ -46,6 +61,7 @@ float ade=0;
 
 int func2(int oi, char eae, float dale) {
   a=func2(ace, ade, abe);
+  //a=func2(ace, ade); // ERRO
 }
 
 int func3() {
