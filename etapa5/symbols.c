@@ -73,3 +73,11 @@ void printDebugSymbol(symbol_t* symbol) {
 	printf("Line: %d\n", symbol->line);
 	return;
 }
+
+symbol_t* makeTemp(void) {
+	static int serialNum = 0;
+	static char buffer[64];
+
+	snprintf(buffer, "__xXxtempVarxXx123456(%d)__",serialNum++);
+	return addSymbol(**INSERIRMAPA**, LIT_INTEGER, buffer, -1);
+}

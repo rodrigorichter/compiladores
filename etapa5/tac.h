@@ -7,10 +7,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TAC_SYMBOL 1
-#define TAC_ADD 2
-#define TAC_PROGRAM 3
-#define TAC_DEC_LIST 4
+#define TAC_SYMBOL 		1
+#define TAC_ADD 		2
+#define TAC_PROGRAM 	3
+#define TAC_DEC_LIST 	4
+#define TAC_DEC_VALUE 	5
+#define TAC_BEGIN_FUNC 	6
+#define TAC_END_FUNC 	7
 
 typedef struct tac {
 	int type;
@@ -21,7 +24,7 @@ typedef struct tac {
 	struct tac *next;
 } TAC;
 
-TAC* tacPrintSingle(TAC* tac);
+void tacPrintBack(TAC* tac);
 
 
 #endif TAC_HEADER

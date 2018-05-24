@@ -28,24 +28,44 @@ TAC* tacJoin(TAC* t1, TAC* t2) {
 }
 
 TAC* tacPrintSingle(TAC* tac) {
-	if(!tac) return 0;
+	if(!tac) return;
 	fprintf(stderr, "TAC(");
 
 	switch(tac->type) {
-		case TAC_SYMBOL:
-			fprintf(stderr, "TAC_SYMBOL\n");
+		case TAC_DEC_VALUE:
+			fprintf(stderr, "TAC_DEC_VALUE");
 			break;
-		case TAC_PROGRAM:
-			fprintf(stderr, "TAC_PROGRAM\n");
+		case TAC_BEGIN_FUNC:
+			fprintf(stderr, "TAC_BEGIN_FUNC");
 			break;
 		case TAC_DEC_LIST:
-			fprintf(stderr, "TAC_DEC_LIST\n");
+			fprintf(stderr, "TAC_DEC_LIST");
+			break;
+		case TAC_END_FUNC:
+			fprintf(stderr, "TAC_END_FUNC");
+			break;
+		default:
+			fprintf(stderr, "%d",tac->type);
 			break;
 	}
+
+	if (tac->res) fprintf(stderr, ",%s",tac->res->key);
+	else fprintf(stderr, ",0");
+	if (tac->op1) fprintf(stderr, ",%s",tac->op1->key);
+	else fprintf(stderr, ",0");
+	if (tac->op2) fprintf(stderr, ",%s",tac->op2->key);
+	else fprintf(stderr, ",0");
+	fprintf(stderr, ")\n");
+}
+
+void tacPrintBack(TAC *tac) {
+	if (!tac) return;
+
+	tacPrintSingle(tac);
+	tacPrintBack(tac->prev);
 }
 
 TAC* generateCode(AST* node) {
-	fprintf(stderr, "----OI----\n");
 	if (!node) return 0;
 
 	TAC* result=0;
@@ -56,18 +76,32 @@ TAC* generateCode(AST* node) {
 	}
 
 	switch(node->type) {
-		case AST_PROGRAM:
-		fprintf(stderr, "WTF, %d\n",sonCode[0]->type);
-			result = tacJoin(tacCreate(TAC_PROGRAM,0,0,0),sonCode[0]);
-			break;
 		case AST_SYMBOL:
 			result = tacCreate(TAC_SYMBOL, node->symbol,0,0);
 			break;
+		case AST_DEC_VALUE:
+			result = tacCreate(TAC_DEC_VALUE,node->symbol,0,0);
+			break;
+		case AST_DEC_FUNC:
+			result = tacJoin(tacJoin(tacJoin(tacCreate(TAC_BEGIN_FUNC,node->symbol,0,0),sonCode[0]),sonCode[1]),tacCreate(TAC_END_FUNC,0,0,0));
+			break;
+		case AST_VALUE_ASS:
+			result = tacCreate(TAC_VALUE_ASS,sonCode[0]->res,node->symbol,0);
+			break;
 		case AST_ADD:
 			result = tacCreate(TAC_ADD, node->symbol,0,0);
+			break;
+		default:
+			result = tacJoin(tacJoin(tacJoin(sonCode[0],sonCode[1]),sonCode[2]),sonCode[3]);
 			break;
 	}
 
 	return result;
 
+}
+
+TAC* makeBinOp(int type, TAC* sonCode0, TAC* sonCode1) {
+	TAC* newTac = tacCreate(TAC_ADD, makeTemp(), sonCode0?->sonCode0->res:0,sonCode1?->sonCode1->res:0);
+
+	return tacJoin(tacJoin(sonCode0,sonCode1),newTac);
 }
