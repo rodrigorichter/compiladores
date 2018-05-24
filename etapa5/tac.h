@@ -13,7 +13,7 @@
 #define TAC_DEC_VALUE 	4
 #define TAC_BEGIN_FUNC 	5
 #define TAC_END_FUNC 	6
-#define TAC_MOVE 		7
+#define TAC_VALUE_ASS	7
 #define TAC_ADD 		8
 #define TAC_SUB 		9
 #define TAC_MULT 		10
@@ -44,6 +44,8 @@ typedef struct tac {
 } TAC;
 
 void tacPrintBack(TAC* tac);
+TAC* tacReverse(TAC *last);
+void tacPrintForward(TAC* tac);
 
 
 #endif TAC_HEADER

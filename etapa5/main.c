@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "decompiler.h"
 #include "semantic.h"
+#include "tac.h"
 
 int isRunning();
 int yyparse();
@@ -53,7 +54,11 @@ int main(int argc, char *argv[]) {
 	} else {
 		printf("Sucesso na verificacao semantica.\n");
 	}
-	tacPrintBack(generateCode(root));
+
+	TAC* tac = 0;
+	tac = generateCode(root);
+	tac = tacReverse(tac);
+	tacPrintForward(tac);
 
 	exit(semanticResult);
 }

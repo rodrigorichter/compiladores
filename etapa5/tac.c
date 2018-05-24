@@ -41,7 +41,7 @@ TAC* tacPrintSingle(TAC* tac) {
 		case TAC_BEGIN_FUNC:fprintf(stderr, "TAC_BEGIN_FUNC");	break;
 		case TAC_DEC_LIST:	fprintf(stderr, "TAC_DEC_LIST");	break;
 		case TAC_END_FUNC:	fprintf(stderr, "TAC_END_FUNC");	break;
-		case TAC_MOVE:		fprintf(stderr, "TAC_MOVE");		break;
+		case TAC_VALUE_ASS:	fprintf(stderr, "TAC_VALUE_ASS");	break;
 
 		case TAC_ADD:		fprintf(stderr, "TAC_ADD");			break;
 		case TAC_SUB:		fprintf(stderr, "TAC_SUB");			break;
@@ -84,6 +84,23 @@ void tacPrintBack(TAC *tac) {
 	tacPrintBack(tac->prev);
 }
 
+void tacPrintForward(TAC *tac) {
+	if (!tac) return;
+
+	tacPrintSingle(tac);
+	tacPrintForward(tac->next);
+}
+
+TAC* tacReverse(TAC *last) {
+	TAC* tac = 0;
+
+	for(tac=last;tac->prev;tac=tac->prev) {
+		tac->prev->next = tac;
+	}
+
+	return tac;
+}
+
 TAC* generateCode(AST* node) {
 	if (!node) return 0;
 
@@ -108,7 +125,7 @@ TAC* generateCode(AST* node) {
 			break;
 
 		case AST_VALUE_ASS:
-			result = tacJoin(sonCode[0],tacCreate(TAC_MOVE,node->symbol,sonCode[0]?sonCode[0]->res:0,0));
+			result = tacJoin(sonCode[0],tacCreate(TAC_VALUE_ASS,node->symbol,sonCode[0]?sonCode[0]->res:0,0));
 			break;
 
 		case AST_ADD: 	result = makeBinOp(TAC_ADD,sonCode[0],sonCode[1]);	break;

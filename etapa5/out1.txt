@@ -1,5 +1,7 @@
 int a = 0;
+int b = 0;
 int main(int wow) {
-while (a > 2)
-a = 10;
+a = 2;
+a = 543 + 11;
+b = main(a);
 }
