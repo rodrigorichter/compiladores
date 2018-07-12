@@ -6,7 +6,7 @@ TAC* makeBinOp(int type, TAC* sonCode0, TAC* sonCode1);
 TAC* makeIfThen(TAC* sonCode0, TAC* sonCode1);
 TAC* makeIfThenElse(TAC* sonCode0, TAC* sonCode1, TAC* sonCode2);
 TAC* makeWhile(TAC* sonCode0, TAC* sonCode1);
-TAC* makeInvokeFunc(TAC* sonCode0);
+//TAC* makeInvokeFunc(TAC* sonCode0);
 
 TAC* tacCreate(int type, symbol_t* res, symbol_t* op1, symbol_t* op2) {
 	TAC* newTac;
@@ -35,6 +35,7 @@ TAC* tacJoin(TAC* t1, TAC* t2) {
 
 TAC* tacPrintSingle(TAC* tac) {
 	if(!tac) return;
+	if(tac->type==TAC_SYMBOL) return;
 	fprintf(stderr, "TAC(");
 
 	switch(tac->type) {
@@ -118,7 +119,7 @@ TAC* generateCode(AST* node) {
 			break;
 			
 		case AST_DEC_VALUE:
-			result = tacCreate(TAC_DEC_VALUE,node->symbol,0,0);
+			result = tacCreate(TAC_DEC_VALUE,node->symbol,sonCode[0]?sonCode[0]->res:0,0);
 			break;
 
 		case AST_DEC_FUNC:
@@ -147,7 +148,7 @@ TAC* generateCode(AST* node) {
 		case AST_IF_THEN:		result = makeIfThen(sonCode[0],sonCode[1]);		break;
 		case AST_IF_THEN_ELSE:	result = makeIfThenElse(sonCode[0],sonCode[1],sonCode[2]);		break;
 		case AST_INVOKE_FUNC:	result = tacJoin(sonCode[0],tacCreate(TAC_FUNC_CALL,node->symbol,0,0));	break;
-		case AST_ARG_LIST:		result = tacJoin(tacCreate(TAC_ARG,node->symbol,0,0),sonCode[0]);	break;
+		//case AST_ARG_LIST:		result = tacJoin(tacCreate(TAC_ARG,node->symbol,0,0),sonCode[0]);	break;
 		case AST_WHILE:			result = makeWhile(sonCode[0],sonCode[1]);	break;
 
 
@@ -212,9 +213,27 @@ TAC* makeWhile(TAC* sonCode0, TAC* sonCode1) {
 	return tacJoin(tacJoin(tacJoin(tacJoin(tacJoin(labelTacWhile,sonCode0),ifTac),sonCode1),jumpTac),labelTac);
 }
 
-TAC* makeInvokeFunc(TAC* sonCode0) {
+void makeAsbly(TAC* tac) {
+		fprintf(f, ".text\n.globl	main\n.type	main, @function\nmain:\n.cfi_startproc\npushq	%%rbp\nmovq	%%rsp, %%rbp\n");
+	while(tac) {
+		switch(tac->type) {
+			case TAC_ADD: fprintf(f, "movl	%s(%%rbp), %%eax \nadd	%s(%%rbp), %%eax \nmovl	%%eax, %s(%%rbp) \n",tac->op1->key,tac->op2->key,tac->res->key); break;
+			case TAC_SUB: fprintf(f, "movl	%s(%%rbp), %%eax \nsubl	%s(%%rbp), %%eax \nmovl	%%eax, %s(%%rbp) \n",tac->op1->key,tac->op2->key,tac->res->key); break;
+			case TAC_MULT: fprintf(f, "movl	%s(%%rbp), %%eax \nimull	%s(%%rbp), %%eax \nmovl	%%eax, %s(%%rbp) \n",tac->op1->key,tac->op2->key,tac->res->key); break;
+			case TAC_DIV: fprintf(f, "movl	%s(%%rbp), %%eax \ncltd\nidivl	%s(%%rbp) \nmovl	%%eax, %s(%%rbp) \n",tac->op2->key,tac->op1->key,tac->res->key); break;
+			case TAC_DEC_VALUE: fprintf(f, "movl	%s, %s(%%rbp) \n",tac->op1->key,tac->res->key); break;
+
+		}
+
+		tac=tac->next;
+	}
+		fprintf(f, "movl	$0, %%eax\npopq	%%rbp\nret\n.cfi_endproc\n");
+
+}
+
+/*TAC* makeInvokeFunc(TAC* sonCode0) {
 	TAC* newTac = 0;
 	
 	newTac = 
 	
-}
+}*/
