@@ -224,6 +224,10 @@ void makeAsbly(TAC* tac) {
 			case TAC_DEC_VALUE: fprintf(f, "	movl	%s, %s(%%rbp)\n",tac->op1->key,tac->res->key); break;
 			case TAC_VALUE_ASS: fprintf(f, "	movl	%s(%%rbp), %%eax\n 	movl	%%eax, %s(%%rbp) \n",tac->op1->key,tac->res->key); break;
 			case TAC_GREATER: fprintf(f, "	movl	%s(%%rbp), %%eax\n 	cmpl	%s(%%rbp), %%eax \n 	movl	%%eax, %s(%%rbp)\n",tac->op1->key,tac->op2->key,tac->res->key); break;
+			case TAC_LESS: fprintf(f, "	movl	%s(%%rbp), %%eax\n 	cmpl	%s(%%rbp), %%eax \n 	movl	%%eax, %s(%%rbp)\n",tac->op1->key,tac->op2->key,tac->res->key); break;
+			case TAC_GREATER_EQ: fprintf(f, "	movl	%s(%%rbp), %%eax\n 	cmpl	%s(%%rbp), %%eax \n 	movl	%%eax, %s(%%rbp)\n",tac->op1->key,tac->op2->key,tac->res->key); break;
+			case TAC_LESS_EQ: fprintf(f, "	movl	%s(%%rbp), %%eax\n 	cmpl	%s(%%rbp), %%eax \n 	movl	%%eax, %s(%%rbp)\n",tac->op1->key,tac->op2->key,tac->res->key); break;
+			case TAC_NOT: fprintf(f, "	cmpl	$0, %s(%%rbp)\n	sete	%%al\n 	movzbl	%%al, %s(%%rbp)\n",tac->op1->key,tac->res->key); break;
 			case TAC_IFZERO: fprintf(f, "	cmpl	$0, %s(%%rbp)\n 	je	%s\n",tac->op1->key,tac->res->key); break;
 			case TAC_LABEL: fprintf(f, "%s:\n",tac->res->key); break;
 
