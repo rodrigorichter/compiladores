@@ -1,17 +1,28 @@
-.text
-.globl	main
-.type	main, @function
+	.file	"tst.c"
+	.text
+	.globl	main
+	.type	main, @function
 main:
-.cfi_startproc
-pushq	%rbp
-movq	%rsp, %rbp
-movl	10, a(%rbp) 
-movl	10, b(%rbp) 
-movl	b(%rbp), %eax 
-cltd
-idivl	a(%rbp) 
-movl	%eax, __xXxtempVarxXx123456TEMP(0)__(%rbp) 
-movl	$0, %eax
-popq	%rbp
-ret
-.cfi_endproc
+.LFB0:
+	.cfi_startproc
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	movl	$1, -8(%rbp)
+	movl	$1, -4(%rbp)
+	movl	-8(%rbp), %eax
+	cmpl	-4(%rbp), %eax
+	jle	.L2
+	movl	$3, -8(%rbp)
+.L2:
+	movl	$0, %eax
+	popq	%rbp
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE0:
+	.size	main, .-main
+	.ident	"GCC: (Ubuntu 5.4.0-6ubuntu1~16.04.10) 5.4.0 20160609"
+	.section	.note.GNU-stack,"",@progbits

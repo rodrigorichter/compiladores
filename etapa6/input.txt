@@ -2,5 +2,5 @@ int a=10;
 int b=10;
 
 int main(int wow) {
-  a=a/b;
+  if(a>b) then ;
 }

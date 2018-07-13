@@ -222,6 +222,8 @@ void makeAsbly(TAC* tac) {
 			case TAC_MULT: fprintf(f, "movl	%s(%%rbp), %%eax \nimull	%s(%%rbp), %%eax \nmovl	%%eax, %s(%%rbp) \n",tac->op1->key,tac->op2->key,tac->res->key); break;
 			case TAC_DIV: fprintf(f, "movl	%s(%%rbp), %%eax \ncltd\nidivl	%s(%%rbp) \nmovl	%%eax, %s(%%rbp) \n",tac->op2->key,tac->op1->key,tac->res->key); break;
 			case TAC_DEC_VALUE: fprintf(f, "movl	%s, %s(%%rbp) \n",tac->op1->key,tac->res->key); break;
+			case TAC_VALUE_ASS: fprintf(f, "movl	%s(%%rbp), %%eax\n	movl	%%eax, %s(%%rbp) \n",tac->op1->key,tac->res->key); break;
+			case TAC_NOT: fprintf(f, "cmpl	$0, %s(%%rbp)\n	sete	%%al\n	movzbl	%%al, %%eax \n 	movl	%eax, -8(%rbp)\n",tac->op1->key,tac->res->key); break;
 
 		}
 

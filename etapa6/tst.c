@@ -3,7 +3,6 @@
 int main() {
 	int a=1;
 	int b=1;
-	int c=1;
-	a=b/a;
+	if(a>b) a=3;
 	return 0;
 }
