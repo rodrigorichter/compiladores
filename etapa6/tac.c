@@ -214,22 +214,24 @@ TAC* makeWhile(TAC* sonCode0, TAC* sonCode1) {
 }
 
 void makeAsbly(TAC* tac) {
-		fprintf(f, ".text\n.globl	main\n.type	main, @function\nmain:\n.cfi_startproc\npushq	%%rbp\nmovq	%%rsp, %%rbp\n");
+		fprintf(f, ".text\n.globl	main\n.type	main, @function\nmain:\n	.cfi_startproc\n 	pushq	%%rbp\n 	movq	%%rsp, %%rbp\n");
 	while(tac) {
 		switch(tac->type) {
-			case TAC_ADD: fprintf(f, "movl	%s(%%rbp), %%eax \nadd	%s(%%rbp), %%eax \nmovl	%%eax, %s(%%rbp) \n",tac->op1->key,tac->op2->key,tac->res->key); break;
-			case TAC_SUB: fprintf(f, "movl	%s(%%rbp), %%eax \nsubl	%s(%%rbp), %%eax \nmovl	%%eax, %s(%%rbp) \n",tac->op1->key,tac->op2->key,tac->res->key); break;
-			case TAC_MULT: fprintf(f, "movl	%s(%%rbp), %%eax \nimull	%s(%%rbp), %%eax \nmovl	%%eax, %s(%%rbp) \n",tac->op1->key,tac->op2->key,tac->res->key); break;
-			case TAC_DIV: fprintf(f, "movl	%s(%%rbp), %%eax \ncltd\nidivl	%s(%%rbp) \nmovl	%%eax, %s(%%rbp) \n",tac->op2->key,tac->op1->key,tac->res->key); break;
-			case TAC_DEC_VALUE: fprintf(f, "movl	%s, %s(%%rbp) \n",tac->op1->key,tac->res->key); break;
-			case TAC_VALUE_ASS: fprintf(f, "movl	%s(%%rbp), %%eax\n	movl	%%eax, %s(%%rbp) \n",tac->op1->key,tac->res->key); break;
-			case TAC_NOT: fprintf(f, "cmpl	$0, %s(%%rbp)\n	sete	%%al\n	movzbl	%%al, %%eax \n 	movl	%eax, -8(%rbp)\n",tac->op1->key,tac->res->key); break;
+			case TAC_ADD: fprintf(f, "	movl	%s(%%rbp), %%eax \n 	add	%s(%%rbp), %%eax \n 	movl	%%eax, %s(%%rbp) \n",tac->op1->key,tac->op2->key,tac->res->key); break;
+			case TAC_SUB: fprintf(f, "	movl	%s(%%rbp), %%eax \n 	subl	%s(%%rbp), %%eax \n 	movl	%%eax, %s(%%rbp) \n",tac->op1->key,tac->op2->key,tac->res->key); break;
+			case TAC_MULT: fprintf(f, "	movl	%s(%%rbp), %%eax \n 	imull	%s(%%rbp), %%eax \n 	movl	%%eax, %s(%%rbp) \n",tac->op1->key,tac->op2->key,tac->res->key); break;
+			case TAC_DIV: fprintf(f, "	movl	%s(%%rbp), %%eax \n 	cltd\n 	idivl	%s(%%rbp) \n 	movl	%%eax, %s(%%rbp) \n",tac->op2->key,tac->op1->key,tac->res->key); break;
+			case TAC_DEC_VALUE: fprintf(f, "	movl	%s, %s(%%rbp)\n",tac->op1->key,tac->res->key); break;
+			case TAC_VALUE_ASS: fprintf(f, "	movl	%s(%%rbp), %%eax\n 	movl	%%eax, %s(%%rbp) \n",tac->op1->key,tac->res->key); break;
+			case TAC_GREATER: fprintf(f, "	movl	%s(%%rbp), %%eax\n 	cmpl	%s(%%rbp), %%eax \n 	movl	%%eax, %s(%%rbp)\n",tac->op1->key,tac->op2->key,tac->res->key); break;
+			case TAC_IFZERO: fprintf(f, "	cmpl	$0, %s(%%rbp)\n 	je	%s\n",tac->op1->key,tac->res->key); break;
+			case TAC_LABEL: fprintf(f, "%s:\n",tac->res->key); break;
 
 		}
 
 		tac=tac->next;
 	}
-		fprintf(f, "movl	$0, %%eax\npopq	%%rbp\nret\n.cfi_endproc\n");
+		fprintf(f, "	movl	$0, %%eax\n 	popq	%%rbp\n 	ret\n 	.cfi_endproc\n");
 
 }
 

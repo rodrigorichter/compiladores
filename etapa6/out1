@@ -2,12 +2,20 @@
 .globl	main
 .type	main, @function
 main:
-.cfi_startproc
-pushq	%rbp
-movq	%rsp, %rbp
-movl	10, a(%rbp) 
-movl	10, b(%rbp) 
-movl	$0, %eax
-popq	%rbp
-ret
-.cfi_endproc
+	.cfi_startproc
+ 	pushq	%rbp
+ 	movq	%rsp, %rbp
+	movl	10, a(%rbp)
+	movl	10, b(%rbp)
+	movl	a(%rbp), %eax
+ 	cmpl	b(%rbp), %eax 
+ 	movl	%eax, __xXxtempVarxXx123456TEMP(0)__(%rbp)
+	cmpl	$0, __xXxtempVarxXx123456TEMP(0)__(%rbp)
+ 	je	__xXxtempVarxXx123456LABEL(0)__
+	movl	23(%rbp), %eax
+ 	movl	%eax, a(%rbp) 
+__xXxtempVarxXx123456LABEL(0)__:
+	movl	$0, %eax
+ 	popq	%rbp
+ 	ret
+ 	.cfi_endproc

@@ -12,9 +12,8 @@ main:
 	.cfi_def_cfa_register 6
 	movl	$1, -8(%rbp)
 	movl	$1, -4(%rbp)
-	movl	-8(%rbp), %eax
-	cmpl	-4(%rbp), %eax
-	jle	.L2
+	cmpl	$0, -8(%rbp)
+	jne	.L2
 	movl	$3, -8(%rbp)
 .L2:
 	movl	$0, %eax
