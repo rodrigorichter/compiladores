@@ -1,28 +1,81 @@
-	.file	"tst.c"
-	.text
-	.globl	main
-	.type	main, @function
+.data
+.globl  __xXxtempVarxXx123456TEMP0__
+.align 4
+.type __xXxtempVarxXx123456TEMP0__, @object
+.size __xXxtempVarxXx123456TEMP0__, 4
+__xXxtempVarxXx123456TEMP0__:
+	.long 2
+
+.globl  __xXxtempVarxXx123456TEMP5__
+.align 4
+.type __xXxtempVarxXx123456TEMP5__, @object
+.size __xXxtempVarxXx123456TEMP5__, 4
+__xXxtempVarxXx123456TEMP5__:
+	.long 25
+
+.globl  b
+.align 4
+.type b, @object
+.size b, 4
+b:
+	.long 0
+
+.globl  __xXxtempVarxXx123456TEMP3__
+.align 4
+.type __xXxtempVarxXx123456TEMP3__, @object
+.size __xXxtempVarxXx123456TEMP3__, 4
+__xXxtempVarxXx123456TEMP3__:
+	.long 4
+
+.globl  a
+.align 4
+.type a, @object
+.size a, 4
+a:
+	.long 0
+
+.globl  __xXxtempVarxXx123456TEMP2__
+.align 4
+.type __xXxtempVarxXx123456TEMP2__, @object
+.size __xXxtempVarxXx123456TEMP2__, 4
+__xXxtempVarxXx123456TEMP2__:
+	.long 0
+
+.globl  __xXxtempVarxXx123456TEMP1__
+.align 4
+.type __xXxtempVarxXx123456TEMP1__, @object
+.size __xXxtempVarxXx123456TEMP1__, 4
+__xXxtempVarxXx123456TEMP1__:
+	.long 10
+
+.globl  __xXxtempVarxXx123456TEMP4__
+.align 4
+.type __xXxtempVarxXx123456TEMP4__, @object
+.size __xXxtempVarxXx123456TEMP4__, 4
+__xXxtempVarxXx123456TEMP4__:
+	.long 0
+
+.text
+.globl	main
+.type	main, @function
 main:
-.LFB0:
 	.cfi_startproc
-	pushq	%rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	movq	%rsp, %rbp
-	.cfi_def_cfa_register 6
-	movl	$1, -8(%rbp)
-	movl	$1, -4(%rbp)
-	movl	-8(%rbp), %eax
-	cmpl	-4(%rbp), %eax
-	je	.L2
-	movl	$3, -8(%rbp)
-.L2:
+ 	pushq	%rbp
+ 	movq	%rsp, %rbp
+	movl	__xXxtempVarxXx123456TEMP0__(%rip), %eax
+ 	movl	%eax, a(%rip) 
+	movl	__xXxtempVarxXx123456TEMP1__(%rip), %eax
+ 	movl	%eax, b(%rip) 
+	movl	__xXxtempVarxXx123456TEMP2__(%rip), %eax
+ 	cmpl	__xXxtempVarxXx123456TEMP3__(%rip), %eax 
+ 	movl	%eax, __xXxtempVarxXx123456TEMP4__(%rip)
+	cmpl	$0, __xXxtempVarxXx123456TEMP4__(%rip)
+ 	je	LABEL__xXxtempVarxXx123456LABEL0__
+	movl	__xXxtempVarxXx123456TEMP5__(%rip), %eax
+ 	movl	%eax, b(%rip) 
+LABEL__xXxtempVarxXx123456LABEL0__:
 	movl	$0, %eax
-	popq	%rbp
-	.cfi_def_cfa 7, 8
-	ret
-	.cfi_endproc
-.LFE0:
+ 	popq	%rbp
+ 	ret
+ 	.cfi_endproc
 	.size	main, .-main
-	.ident	"GCC: (Ubuntu 5.4.0-6ubuntu1~16.04.10) 5.4.0 20160609"
-	.section	.note.GNU-stack,"",@progbits

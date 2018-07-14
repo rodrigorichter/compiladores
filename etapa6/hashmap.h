@@ -46,7 +46,6 @@ extern map_t hashmap_new();
  * not reenter any hashmap functions, or deadlock may arise.
  */
 extern int hashmap_iterate(map_t in, PFany f, any_t item);
-
 /*
  * Add an element to the hashmap. Return MAP_OK or MAP_OMEM.
  */

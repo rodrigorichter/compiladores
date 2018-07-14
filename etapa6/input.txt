@@ -1,6 +1,6 @@
-int a=10;
+int a=2;
 int b=10;
 
-int main(int wow) {
-  if(!b) then a=23;
+int main() {
+  if(a<4) then b=25;
 }

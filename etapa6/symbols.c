@@ -1,4 +1,5 @@
 #include "symbols.h"
+#include "decompiler.h"
 #include "y.tab.h"
 #include <string.h>
 
@@ -66,11 +67,14 @@ symbol_t* getSymbol(map_t *map, char *key) {
 }
 
 void printDebugSymbol(symbol_t* symbol) {
-	printf("Printing Symbol\n");
-	printf("	-Key: %s\n", symbol->key);
-	printf("	-Type: %d\n", symbol->type);
-	printf("	-DataType: %d\n", symbol->dataType);
-	printf("	-Line: %d\n\n", symbol->line);
+	if(strcmp(symbol->key,"main")==0) return;
+	char test[6];
+	strncpy(test,symbol->key,5);
+	test[5] = '\0';
+	if(strcmp(test,"LABEL")==0) return;
+	
+	fprintf(f, ".globl  %s\n.align 4\n.type %s, @object\n.size %s, 4\n%s:\n\t.long %i\n\n",symbol->key,symbol->key,symbol->key,symbol->key,symbol->intValue);
+
 	return;
 }
 
@@ -83,7 +87,7 @@ symbol_t* makeTemp(void) {
 	static int serialNum = 0;
 	static char buffer[64];
 
-	snprintf(buffer, 64, "__xXxtempVarxXx123456TEMP(%d)__",serialNum++);
+	snprintf(buffer, 64, "__xXxtempVarxXx123456TEMP%d__",serialNum++);
 	return addSymbol(programScope, LIT_INTEGER, buffer, 0);
 }
 
@@ -91,6 +95,6 @@ symbol_t* makeLabel(void) {
 	static int serialNum = 0;
 	static char buffer[64];
 
-	snprintf(buffer, 64, "__xXxtempVarxXx123456LABEL(%d)__",serialNum++);
+	snprintf(buffer, 64, "LABEL__xXxtempVarxXx123456LABEL%d__",serialNum++);
 	return addSymbol(programScope, LIT_INTEGER, buffer, 0);
 }

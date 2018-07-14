@@ -80,7 +80,7 @@ int yylex();
 program:
 	decl { 
 		$$ = astCreate(AST_PROGRAM,0,$1,0,0,0);
-		//astPrint(astSetRoot($$),0);
+		astPrint(astSetRoot($$),0);
 		astSetRoot($$);
 		//decompile($$);
 	}

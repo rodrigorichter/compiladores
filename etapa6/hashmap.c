@@ -364,7 +364,6 @@ int hashmap_print(map_t in) {
 
     return MAP_OK;
 }
-
 /*
  * Remove an element with that key from the map
  */
