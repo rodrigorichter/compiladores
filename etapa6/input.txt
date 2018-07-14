@@ -2,5 +2,5 @@ int a=2;
 int b=10;
 
 int main() {
-  if(a<4) then b=25;
+  if(a==b) then b=25;
 }

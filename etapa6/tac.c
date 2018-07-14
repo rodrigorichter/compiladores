@@ -230,12 +230,13 @@ void makeAsbly(TAC* tac) {
 			case TAC_DIV: fprintf(f, "	movl	%s(%%rip), %%eax \n 	cltd\n 	idivl	%s(%%rip) \n 	movl	%%eax, %s(%%rip) \n",tac->op2->key,tac->op1->key,tac->res->key); break;
 			case TAC_VALUE_ASS: fprintf(f, "	movl	%s(%%rip), %%eax\n 	movl	%%eax, %s(%%rip) \n",tac->op1->key,tac->res->key); break;
 			case TAC_DEC_VALUE: fprintf(f, "	movl	%s(%%rip), %%eax\n 	movl	%%eax, %s(%%rip) \n",tac->op1->key,tac->res->key); break;
-			case TAC_GREATER: fprintf(f, "	movl	%s(%%rip), %%eax\n 	cmpl	%s(%%rip), %%eax \n 	movl	%%eax, %s(%%rip)\n",tac->op1->key,tac->op2->key,tac->res->key); break;
-			case TAC_LESS: fprintf(f, "	movl	%s(%%rip), %%eax\n 	cmpl	%s(%%rip), %%eax \n 	movl	%%eax, %s(%%rip)\n",tac->op1->key,tac->op2->key,tac->res->key); break;
-			case TAC_GREATER_EQ: fprintf(f, "	movl	%s(%%rip), %%eax\n 	cmpl	%s(%%rip), %%eax \n 	movl	%%eax, %s(%%rip)\n",tac->op1->key,tac->op2->key,tac->res->key); break;
-			case TAC_LESS_EQ: fprintf(f, "	movl	%s(%%rip), %%eax\n 	cmpl	%s(%%rip), %%eax \n 	movl	%%eax, %s(%%rip)\n",tac->op1->key,tac->op2->key,tac->res->key); break;
-			case TAC_NOT: fprintf(f, "	cmpl	$0, %s(%%rip)\n	sete	%%al\n 	movzbl	%%al, %s(%%rip)\n",tac->op1->key,tac->res->key); break;
-			case TAC_IFZERO: fprintf(f, "	cmpl	$0, %s(%%rip)\n 	je	%s\n",tac->op1->key,tac->res->key); break;
+			case TAC_GREATER: fprintf(f, "	movl	%s(%%rip), %%eax\n 	subl	%s(%%rip), %%eax \n 	movl	%%eax, %s(%%rip)\n",tac->op1->key,tac->op2->key,tac->res->key); break;
+			case TAC_LESS: fprintf(f, "	movl	%s(%%rip), %%eax\n 	subl	%s(%%rip), %%eax \n 	movl	%%eax, %s(%%rip)\n",tac->op2->key,tac->op1->key,tac->res->key); break;
+			case TAC_GREATER_EQ: fprintf(f, "	movl	%s(%%rip), %%eax\n 	addl $1, %%eax\n 	subl	%s(%%rip), %%eax \n 	movl	%%eax, %s(%%rip)\n",tac->op1->key,tac->op2->key,tac->res->key); break;
+			case TAC_LESS_EQ: fprintf(f, "	movl	%s(%%rip), %%eax\n 	subl $1, 	%%eax\n 	subl	%s(%%rip), %%eax \n 	movl	%%eax, %s(%%rip)\n",tac->op2->key,tac->op1->key,tac->res->key); break;
+			//case TAC_EQ: fprintf(f, "\tmovl\t%s(%%rip), %%edx\n\tmovl\t%s(%%rip), %%eax\n\tsubl\t%%eax, %%edx\n\tandl\t$0, %%edx\n\tmovl %%edx, %s(%%rip)\n",tac->op1->key,tac->op2->key,tac->res->key); break;
+			//case TAC_NOT: fprintf(f, "	cmpl	$0, %s(%%rip)\n	sete	%%al\n 	movzbl	%%al, %s(%%rip)\n",tac->op1->key,tac->res->key); break;
+			case TAC_IFZERO: fprintf(f, "	cmpl	$0, %s(%%rip)\n 	jle	%s\n",tac->op1->key,tac->res->key); break;
 			case TAC_LABEL: fprintf(f, "%s:\n",tac->res->key); break;
 
 		}

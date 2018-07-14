@@ -11,7 +11,7 @@ __xXxtempVarxXx123456TEMP0__:
 .type __xXxtempVarxXx123456TEMP5__, @object
 .size __xXxtempVarxXx123456TEMP5__, 4
 __xXxtempVarxXx123456TEMP5__:
-	.long 25
+	.long 0
 
 .globl  b
 .align 4
@@ -25,7 +25,14 @@ b:
 .type __xXxtempVarxXx123456TEMP3__, @object
 .size __xXxtempVarxXx123456TEMP3__, 4
 __xXxtempVarxXx123456TEMP3__:
-	.long 4
+	.long 0
+
+.globl  __xXxtempVarxXx123456TEMP6__
+.align 4
+.type __xXxtempVarxXx123456TEMP6__, @object
+.size __xXxtempVarxXx123456TEMP6__, 4
+__xXxtempVarxXx123456TEMP6__:
+	.long 25
 
 .globl  a
 .align 4
@@ -67,11 +74,14 @@ main:
 	movl	__xXxtempVarxXx123456TEMP1__(%rip), %eax
  	movl	%eax, b(%rip) 
 	movl	__xXxtempVarxXx123456TEMP2__(%rip), %eax
- 	cmpl	__xXxtempVarxXx123456TEMP3__(%rip), %eax 
+ 	subl	__xXxtempVarxXx123456TEMP3__(%rip), %eax 
  	movl	%eax, __xXxtempVarxXx123456TEMP4__(%rip)
 	cmpl	$0, __xXxtempVarxXx123456TEMP4__(%rip)
- 	je	LABEL__xXxtempVarxXx123456LABEL0__
-	movl	__xXxtempVarxXx123456TEMP5__(%rip), %eax
+	sete	%al
+ 	movzbl	%al, __xXxtempVarxXx123456TEMP5__(%rip)
+	cmpl	$0, __xXxtempVarxXx123456TEMP5__(%rip)
+ 	jle	LABEL__xXxtempVarxXx123456LABEL0__
+	movl	__xXxtempVarxXx123456TEMP6__(%rip), %eax
  	movl	%eax, b(%rip) 
 LABEL__xXxtempVarxXx123456LABEL0__:
 	movl	$0, %eax
